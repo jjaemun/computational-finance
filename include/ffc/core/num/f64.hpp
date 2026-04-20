@@ -22,7 +22,8 @@ namespace ffc::core::num {
     /// Compile time assert that the size of `f64` behaves 
     /// according to ieee754 semantics.
     ///
-    /// Beware this does **not** fully prove ieee754 binary64 identity.
+    /// Beware this does **not** fully prove ieee754 binary64 
+    /// identity.
     ///
     /// Guarantees `f64` has a binary radix, supports (±)infinity,
     /// nan, signed zero, and ieee754 style behaviour for those.
