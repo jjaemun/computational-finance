@@ -19,7 +19,7 @@ namespace ffc::core::num {
         constexpr auto MIN{std::numeric_limits<f64>::lowest()};
 
         /// Infinity.
-        constexpr auto INFITY{std::numeric_limits<f64>::infinity()};
+        constexpr auto INFINITY{std::numeric_limits<f64>::infinity()};
 
         /// Negative infinity.
         constexpr auto NEG_INFINITY{-std::numeric_limits<f64>::infinity()};
@@ -28,10 +28,22 @@ namespace ffc::core::num {
         /// floating point number, i.e., the radix.
         constexpr auto RADIX{std::numeric_limits<f64>::radix};
 
-        /// Number of base 10 significant digits. 
+        /// Number of base-10 significant digits. 
         ///
-        /// Denotes the largest  quantity for which conversion to and from 
-        /// `f64` is lossless.
+        /// Denotes the largest base-10 quantity for which a round trip
+        /// conversion `f64` -> decimal -> `f64` is lossless.
+        ///
+        /// ```c++
+        ///
+        /// // safe! 
+        /// const f64 safe = 1.2345678912345;
+        /// // 15 signigicant digits preserved.
+        /// assert(safe == 1.2345678912345);
+        ///
+        /// // unsafe!
+        /// const f64 unsafe = 1.23456789123456;
+        /// // 16th signigicant digit might be lost.
+        /// ```
         constexpr auto DIGITS{std::numeric_limits<f64>::digits10};
 
         /// Quiet iee754 (i.e., non-signaling) nan representation.
@@ -39,9 +51,10 @@ namespace ffc::core::num {
         
         /// Machine epsilon for `f64`.
         ///
-        /// It represents the upper bound of the relative approximation 
-        /// error due to rounding in fp arithmetic or the distance between
-        /// 1.0 and the next larger floating point number.
+        /// Represents the distance between 1.0 and the next larger floating 
+        /// point number. Used as a relative error tolerance in numerical
+        /// comparisons. Do **not** use for absolute comparisons near zero, 
+        /// use MIN_POSITIVE instead.
         constexpr auto EPSILON{std::numeric_limits<f64>::epsilon()};
 
         /// Size of `f64` expressed in bytes.
