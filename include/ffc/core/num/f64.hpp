@@ -5,8 +5,39 @@
 
 
 namespace ffc::core::num {
+    /// A 64-bit ieee754-style double-precision) floating-point number.
+    /// 
+    /// `double` is a relatively loose, implementation-defined type
+    /// that is not explicit about its own width or representation.
+    /// The standard only guarantees it should be at least as precise
+    /// as `float`, while binary layout, size and range are once again
+    /// implementation-defined.
+    ///
+    /// `f64` is an alias of `double` which enforces additional guarantees
+    /// at compile-time.
     using f64 = double;
+
+    /// Compile time assert that the size of `f64` be 8 bytes, as on
+    /// most sane platforms and implementations.
     static_assert(sizeof(f64) == 8uz);
+
+    /// Compile time assert that the size of `f64` behaves according to
+    /// ieee754 semantics.
+    ///
+    /// Beware this does **not** fully prove ieee754 binary64 identity.
+    ///
+    /// Guarantees:
+    /// - binary radix.
+    /// - special value support (infinity, negaive infinity, nan).
+    /// - signed zero.
+    /// - ieee-style behaviour for finite and non-finite values. 
+    ///
+    /// Non-guarantees:
+    /// - exact precision (i.e., not strictly 53-bit precision).
+    /// - exact exponent range.
+    /// - abcess of excess precision in intermediate computations.
+    static_assert(std::numeric_limits<f64>::is_iec559);
+    
 
     namespace fp::f64 {
         /// Largest finite value that can be represented by `f64`.
