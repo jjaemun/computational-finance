@@ -31,7 +31,6 @@ namespace ffc::core::num {
 
     namespace integral::usize {
         constexpr auto MAX{std::numeric_limits<usize>::max()};
-        constexpr auto MIN{std::numeric_limits<usize>::min()};
         constexpr auto BYTES{sizeof(usize)};
         constexpr auto BITS{sizeof(usize) * 8uz};
     } // namespace integral::usize
@@ -45,28 +44,24 @@ namespace ffc::core::num {
 
     namespace integral::u8 {
         constexpr auto MAX{std::numeric_limits<u8>::max()};
-        constexpr auto MIN{std::numeric_limits<u8>::min()};
         constexpr auto BYTES{sizeof(u8)};
         constexpr auto BITS{sizeof(u8) * 8uz};
     } // namespace integral::u8
 
     namespace integral::u16 {
         constexpr auto MAX{std::numeric_limits<u16>::max()};
-        constexpr auto MIN{std::numeric_limits<u16>::min()};
         constexpr auto BYTES{sizeof(u16)};
         constexpr auto BITS{sizeof(u16) * 8uz};
     } // namespace integral::u16
 
     namespace integral::u32 {
         constexpr auto MAX{std::numeric_limits<u32>::max()};
-        constexpr auto MIN{std::numeric_limits<u32>::min()};
         constexpr auto BYTES{sizeof(u32)};
         constexpr auto BITS{sizeof(u32) * 8uz};
     } // namespace integral::u32
 
     namespace integral::u64 {
         constexpr auto MAX{std::numeric_limits<u64>::max()};
-        constexpr auto MIN{std::numeric_limits<u64>::min()};
         constexpr auto BYTES{sizeof(u64)};
         constexpr auto BITS{sizeof(u64) * 8uz};
     } // namespace integral::u64
