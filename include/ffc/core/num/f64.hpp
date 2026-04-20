@@ -9,19 +9,54 @@ namespace ffc::core::num {
     static_assert(sizeof(f64) == 8uz);
 
     namespace fp::f64 {
+        /// Largest finite value that can be represented by `f64`.
         constexpr auto MAX{std::numeric_limits<f64>::max()};
-        constexpr auto MIN{std::numeric_limits<f64>::lowest()};
+
+        /// Smallest finite positive value representable by `f64`.
         constexpr auto MIN_POSITIVE{std::numeric_limits<f64>::min()}; 
-        constexpr auto INF{std::numeric_limits<f64>::infinity()};
-        constexpr auto NEG_INF{-std::numeric_limits<f64>::infinity()};
+
+        /// Smallest finite value that can be represented by `f64`.
+        constexpr auto MIN{std::numeric_limits<f64>::lowest()};
+
+        /// Infinity.
+        constexpr auto INFITY{std::numeric_limits<f64>::infinity()};
+
+        /// Negative infinity.
+        constexpr auto NEG_INFINITY{-std::numeric_limits<f64>::infinity()};
+
+        /// The base of the internal representation for an iee754 64-bit
+        /// floating point number, i.e., the radix.
         constexpr auto RADIX{std::numeric_limits<f64>::radix};
-        constexpr auto DIGITS10{std::numeric_limits<f64>::digits10};
+
+        /// Number of base 10 significant digits. 
+        ///
+        /// Denotes the largest  quantity for which conversion to and from 
+        /// `f64` is lossless.
+        constexpr auto DIGITS{std::numeric_limits<f64>::digits10};
+
+        /// Quiet iee754 (i.e., non-signaling) nan representation.
         constexpr auto QUIET_NAN{std::numeric_limits<f64>::quiet_NaN()};
+        
+        /// Machine epsilon for `f64`.
+        ///
+        /// It represents the upper bound of the relative approximation 
+        /// error due to rounding in fp arithmetic or the distance between
+        /// 1.0 and the next larger floating point number.
         constexpr auto EPSILON{std::numeric_limits<f64>::epsilon()};
+
+        /// Size of `f64` expressed in bytes.
         constexpr auto BYTES{sizeof(f64)};
+
+        /// Size of `f64` expressed in bits.
         constexpr auto BITS{sizeof(f64) * 8uz};
+
+        /// Sign bit mask for `f64`.
         constexpr auto SIGN_MASK{0x8000'0000'0000'0000ULL};
+
+        /// Exponent mask for `f64`.
         constexpr auto EXP_MASK{0x7ff0'0000'0000'0000ULL};
+
+        /// Mantissa mask for `f64`.
         constexpr auto MANTISSA_MASK{0x000f'ffff'ffff'ffffULL};
     } // namespace fp::f64;
 } // namespace ffc::core::num;
