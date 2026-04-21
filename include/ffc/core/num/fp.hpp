@@ -30,7 +30,6 @@ namespace ffc::core::num::fp {
     ///
     /// // compiles.
     /// auto max32f = fp::FpTraits<f32>::MAX;
-    ///
     /// // fails.
     /// auto max8i = fp::FpTraits<i8>::MAX;
     /// ```
@@ -173,5 +172,5 @@ namespace ffc::core::num::fp {
 
         /// Size of `FpType<T>` expressed in bits.
         static constexpr auto BITS{sizeof(T) * 8uz};
-    }
+    };
 } // namespace ffc::core::num.
