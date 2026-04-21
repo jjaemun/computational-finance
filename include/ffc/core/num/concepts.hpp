@@ -67,11 +67,11 @@ namespace ffc::core::num {
                 std::remove_cvref_t<T>, 
                 std::complex<typename std::remove_cvref_t<T>::value_type>>;
 
-    /// Satistfied by `std::complex<U>` specializations 
-    /// whose scalar type is floating-point.
+    /// Satistfied by `std::complex<U>` specializations whose scalar
+    /// type is floating-point.
     /// 
-    /// `FpComplexType<T>` holds iff `T` models `std::complex<U>`
-    /// for some scalar type `U` verifying `FpType<U>`.
+    /// `FpComplexType<T>` holds iff `T` models `std::complex<U>`for some
+    /// scalar type `U` verifying `FpType<U>`.
     ///  
     ///```c++
     ///
