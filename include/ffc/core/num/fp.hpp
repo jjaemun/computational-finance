@@ -72,7 +72,7 @@ namespace ffc::core::num::fp {
 
         /// Smallest finite value that can be represented by `FpType<T>`.
         /// 
-        /// `FpTraits<T>::MAX` is useful for underflow bound checking or
+        /// `FpTraits<T>::MIN` is useful for underflow bound checking or
         /// sentinel values in running maximum computations.
         ///
         ///```c++
@@ -81,7 +81,7 @@ namespace ffc::core::num::fp {
         /// // running max.
         /// f64 max = fp::FpTraits<f64>::MIN;
         /// for (auto val : values)
-        ///     max = std::max(min, val);
+        ///     max = std::max(max, val);
         ///
         /// (...)
         ///```
@@ -89,15 +89,15 @@ namespace ffc::core::num::fp {
 
         /// Positive Infinity.
         ///
-        /// `FpTraits<T>::INFINITY` follows ieee754 conventions, in the 
-        /// sense that `INFINITY + var = INFINITY` for any `FpType<T>` `var`.
-        static constexpr auto INFINITY{std::numeric_limits<T>::infinity()};
+        /// `FpTraits<T>::INF` follows ieee754 conventions, in the 
+        /// sense that `INF + var = INF` for any `FpType<T>` `var`.
+        static constexpr auto INF{std::numeric_limits<T>::infinity()};
 
         /// Negative infinity.
         ///
-        /// `FpTraits<T>::NEG_INFINITY` is the additive inverse of INFINITY, 
-        /// and follows the same ieee754 conventions.
-        static constexpr auto NEG_INFINITY{-std::numeric_limits<T>::infinity()};
+        /// It is the additive inverse of `FpTraits<T>::INF`, and follows
+        /// the same ieee754 conventions.
+        static constexpr auto NEG_INF{-std::numeric_limits<T>::infinity()};
 
         /// Radix (base) of the fp number internal representation.
         ///
@@ -150,7 +150,7 @@ namespace ffc::core::num::fp {
         ///     requires 
         ///         (FpType<T>)
         /// inline bool cmp_approx_eq(T lhs, T rhs) noexcept {
-        ///     return (std::abs(lhs - rhs) <= fp::FpTraits<T>::EPSILON * std::abs(lhs);
+        ///     return std::abs(lhs - rhs) <= fp::FpTraits<T>::EPSILON * std::abs(lhs);
         /// }
         ///```
         static constexpr auto EPSILON{std::numeric_limits<T>::epsilon()};
