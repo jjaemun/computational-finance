@@ -63,8 +63,9 @@ namespace ffc::core::num {
     template <typename T>
     concept ComplexType = requires { 
             typename std::remove_cvref_t<T>::value_type; 
-        } &&  std::same_as<std::remove_cvref_t<T>, 
-                           std::complex<typename std::remove_cvref_t<T>::value_type>>;
+        } &&  std::same_as<
+                std::remove_cvref_t<T>, 
+                std::complex<typename std::remove_cvref_t<T>::value_type>>;
 
     /// Satistfied by `std::complex<U>` specializations 
     /// whose scalar type is floating-point.
