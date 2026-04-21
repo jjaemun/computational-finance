@@ -15,51 +15,110 @@ namespace ffc::core::num::fp {
     /// namespace fp = ffc::core::num::fp;
     /// 
     /// // largest finite f64.
-    /// fp::f64::MAX
+    /// auto max64f = fp::FpTraits<f64>::MAX;
     /// // macheps for f32.
-    /// fp::f32::EPSILON
-    /// // ... are all contained.
+    /// auto eps32f = fp::FpTraits<f32>::EPSILON;
+    ///
+    /// (...) // are all contained.
     /// ```
     ///
     /// The primary template is undefined so that instantiating `FpTraits<T>`
     /// for a non-`FpType<T>` is a hard compile error. 
     ///
     ///```c++
+    /// namespace fp = ffc::core::num::fp;
     ///
     /// // compiles.
-    /// auto max32f = FpTraits<f32>::MAX;
+    /// auto max32f = fp::FpTraits<f32>::MAX;
     ///
     /// // fails.
-    /// auto max8i = FpTraits<i8>::MAX;
+    /// auto max8i = fp::FpTraits<i8>::MAX;
     /// ```
     template <typename T>
-    requires(FpType<T>)
+        requires
+            (FpType<T>)
     struct FpTraits final {
-        /// Largest finite value that can be represented by `f64`.
-        constexpr auto MAX{std::numeric_limits<f64>::max()};
+        /// Largest finite value that can be represented by `FpType<T>`.
+        /// 
+        /// `FpTraits<T>::MAX` is useful for overflow bound checking or
+        /// sentinel values in running minimum computations.
+        ///
+        ///```c++
+        /// namespace fp = ffc::core::num::fp;
+        ///
+        /// // running min.
+        /// f64 min = fp::FpTraits<f64>::MAX;
+        /// for (auto val : values)
+        ///     min = std::min(min, val);
+        ///
+        /// (...)
+        /// ```
+        constexpr auto MAX{std::numeric_limits<T>::max()};
 
-        /// Smallest finite positive value representable by `f64`.
-        constexpr auto MIN_POSITIVE{std::numeric_limits<f64>::min()}; 
+        /// Smallest positive (normal) value representable as `FpType<T>`.
+        ///
+        /// `FpTraits<T>::MIN_POSITIVE` is the normal value closest to zero 
+        ///  therefore it is the safe threshold for fp absolute comparisons near it.
+        ///
+        ///```c++
+        /// namespace fp = ffc::core::num::fp;
+        ///
+        /// template <typename T>
+        ///     requires FpType<T>
+        /// inline bool near_zero(T fp) noexcept {
+        ///     return std::abs(fp) <= fp::FpTraits<T>::MIN_POSITIVE;
+        /// }
+        /// ```
+        constexpr auto MIN_POSITIVE{std::numeric_limits<T>::min()}; 
 
-        /// Smallest finite value that can be represented by `f64`.
-        constexpr auto MIN{std::numeric_limits<f64>::lowest()};
+        /// Smallest finite value that can be represented by `FpType<T>`.
+        /// 
+        /// `FpTraits<T>::MAX` is useful for underflow bound checking or
+        /// sentinel values in running maximum computations.
+        ///
+        ///```c++
+        /// namespace fp = ffc::core::num::fp;
+        ///
+        /// // running max.
+        /// f64 max = fp::FpTraits<f64>::MIN;
+        /// for (auto val : values)
+        ///     max = std::max(min, val);
+        ///
+        /// (...)
+        ///```
+        constexpr auto MIN{std::numeric_limits<T>::lowest()};
 
-        /// Infinity.
-        constexpr auto INFINITY{std::numeric_limits<f64>::infinity()};
+        /// Positive Infinity.
+        ///
+        /// `FpTraits<T>::INFINITY` follows ieee754 conventions, in the 
+        /// sense that `INFINITY + var = INFINITY` for any `FpType<T>` `var`.
+        constexpr auto INFINITY{std::numeric_limits<T>::infinity()};
 
         /// Negative infinity.
-        constexpr auto NEG_INFINITY{-std::numeric_limits<f64>::infinity()};
+        ///
+        /// `FpTraits<T>::NEG_INFINITY` is the additive inverse of INFINITY, 
+        /// and follows the same ieee754 conventions.
+        constexpr auto NEG_INFINITY{-std::numeric_limits<T>::infinity()};
 
-        /// The base of the internal representation for an iee754 64-bit
-        /// floating point number, i.e., the radix.
-        constexpr auto RADIX{std::numeric_limits<f64>::radix};
+        /// Radix (base) of the fp number internal representation.
+        ///
+        /// ieee754 fp numbers should have binary (2) radix. For tracing
+        /// purposes only, to check whether the bit masks below are valid.
+        ///
+        ///```c++
+        /// #include <cassert>
+        ///
+        /// namespace fp = ffc::core::num::fp;
+        /// 
+        /// // strong enforcement of ieee754.
+        /// assert(fp::FpTraits<T>::RADIX == 2);
+        ///```
+        constexpr auto RADIX{std::numeric_limits<T>::radix};
 
         /// Number of base-10 significant digits. 
         ///
-        /// Denotes the largest base-10 quantity for which a round trip
-        /// conversion `f64` -> decimal -> `f64` is lossless.
-        ///
-        /// # Examples
+        /// A round-trip `f64` -> decimal -> `f64` conversion is lossless
+        /// with at most `FpTraits<T>::DIGITS` significant digits. 
         ///
         /// ```c++
         ///
@@ -72,32 +131,43 @@ namespace ffc::core::num::fp {
         /// const f64 unsafe = 1.23456789123456;
         /// // 16th signigicant digit might be lost.
         /// ```
-        constexpr auto DIGITS{std::numeric_limits<f64>::digits10};
+        constexpr auto DIGITS{std::numeric_limits<T>::digits10};
 
-        /// Quiet iee754 (i.e., non-signaling) nan representation.
-        constexpr auto QUIET_NAN{std::numeric_limits<f64>::quiet_NaN()};
+        /// Quiet iee754 (i.e., non-signaling) NAN representation.
+        constexpr auto QUIET_NAN{std::numeric_limits<T>::quiet_NaN()};
         
-        /// Machine epsilon for `f64`.
+        /// Machine epsilon for `FpType<T>`.
         ///
-        /// Represents the distance between 1.0 and the next larger floating 
-        /// point number. Used as a relative error tolerance in numerical
+        /// Represents the distance between `1.0` and the next larger fp
+        /// `FpType<T>`. Used as a relative error tolerance in numerical
         /// comparisons. 
         ///
         /// ** Use MIN_POSITIVE instead for absolute comparisons near zero **
-        constexpr auto EPSILON{std::numeric_limits<f64>::epsilon()};
+        ///
+        ///```c++
+        /// namespace fp = ffc::core::num::fp;
+        ///
+        /// template <typename T>
+        ///     requires FpType<T>
+        /// inline bool cmp_approx_eq(T lhs, T rhs) noexcept {
+        ///     return (std::abs(lhs - rhs) <= fp::FpTraits<T>::EPSILON * std::abs(lhs);
+        /// }
+        ///```
+        constexpr auto EPSILON{std::numeric_limits<T>::epsilon()};
 
-        /// Size of `f64` expressed in bytes.
-        constexpr auto BYTES{sizeof(f64)};
+        /// Size of `FpType<T>` expressed in bytes.
+        ///
+        /// Often required for low-level memory (allocation etc.) 
+        /// applications or in SIMD contexts (register packing etc.).
+        ///
+        /// ```c++
+        /// namespace fp = ffc::core::num::fp;
+        /// 
+        /// template <typename T>
+        ///     requires FpType<T>
+        /// constexpr auto lanes = 32uz / fp::FpTraits<T>::BYTES;
+        constexpr auto BYTES{sizeof(T)};
 
-        /// Size of `f64` expressed in bits.
-        constexpr auto BITS{sizeof(f64) * 8uz};
-
-        /// Sign bit mask for `f64`.
-        constexpr auto SIGN_MASK{0x8000'0000'0000'0000ULL};
-
-        /// Exponent mask for `f64`.
-        constexpr auto EXP_MASK{0x7ff0'0000'0000'0000ULL};
-
-        /// Mantissa mask for `f64`.
-        constexpr auto MANTISSA_MASK{0x000f'ffff'ffff'ffffULL};
+        /// Size of `FpType<T>` expressed in bits.
+        constexpr auto BITS{sizeof(T) * 8uz};
 } // namespace ffc::core::num;
