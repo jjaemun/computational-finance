@@ -58,7 +58,7 @@ namespace ffc::core::num {
 
     /// Satistfied by `std::complex<U>` specializations.
     /// 
-    /// `ComplexType<T>` holds iff `T` models `std::complex<T>`
+    /// `ComplexType<T>` holds iff `T` models `std::complex<U>`
     /// for some valid scalar type `U`.
     template <typename T>
     concept ComplexType = requires { 
@@ -69,7 +69,7 @@ namespace ffc::core::num {
     /// Satistfied by `std::complex<U>` specializations 
     /// whose scalar type is floating-point.
     /// 
-    /// `FpComplexType<T>` holds iff `T` models `std::complex<T>`
+    /// `FpComplexType<T>` holds iff `T` models `std::complex<U>`
     /// for some scalar type `U` verifying `FpType<U>`.
     ///  
     ///```c++
