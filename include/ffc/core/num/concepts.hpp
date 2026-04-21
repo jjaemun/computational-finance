@@ -7,7 +7,22 @@
 
 
 namespace ffc::core::num {
-    /// Satistfied by signed integral types.
+    /// Satisfied by integral scalar types.
+    /// 
+    /// `IntType<T>` holds iff `T` models `std::integral<T>`.
+    ///
+    ///```c++
+    ///
+    /// // compiles.
+    /// static_assert(IntType<i32>);
+    ///
+    /// // fails.
+    /// static_assert(IntType<f64>);
+    /// ```
+    template <typename T>
+    concept IntType = std::integral<T>;
+
+    /// Satisfied by signed integral types.
     /// 
     /// `SignedIntType<T>` holds iff `T` models both `std::integral<T>`
     /// and `std::signed_integral<T>`.
@@ -21,13 +36,13 @@ namespace ffc::core::num {
     /// static_assert(SignedIntType<u32>);
     /// ```
     template <typename T>
-    concept SignedIntType = std::integral<T> 
+    concept SignedIntType = IntType<T> 
         && std::signed_integral<T>;
 
-    /// Satistfied by unsigned integral types.
+    /// Satisfied by unsigned integral types.
     /// 
     /// `UnsignedIntType<T>` holds iff `T` models `std::integral<T>`
-    /// and but *not* `std::signed_integral<T>`.
+    /// but *not* `std::signed_integral<T>`.
     ///
     ///```c++
     ///
@@ -38,10 +53,10 @@ namespace ffc::core::num {
     /// static_assert(UnsignedIntType<i32>);
     /// ```
     template <typename T>
-    concept UnsignedIntType = std::integral<T> 
+    concept UnsignedIntType = IntType<T> 
         && !std::signed_integral<T>;
 
-    /// Satistfied by floating point scalar types.
+    /// Satisfied by floating point scalar types.
     /// 
     /// `FpType<T>` holds iff `T` models `std::floating_point<T>`
     ///
@@ -56,22 +71,22 @@ namespace ffc::core::num {
     template <typename T>
     concept FpType = std::floating_point<T>;
 
-    /// Satistfied by `std::complex<U>` specializations.
+    /// Satisfied by `std::complex<U>` specializations.
     /// 
     /// `ComplexType<T>` holds iff `T` models `std::complex<U>`
     /// for some valid scalar type `U`.
     template <typename T>
-    concept ComplexType = requires { 
+    concept ComplexType = requires {
             typename std::remove_cvref_t<T>::value_type; 
         } &&  std::same_as<
                 std::remove_cvref_t<T>, 
                 std::complex<typename std::remove_cvref_t<T>::value_type>>;
 
-    /// Satistfied by `std::complex<U>` specializations whose scalar
+    /// Satisfied by `std::complex<U>` specializations whose scalar
     /// type is floating-point.
     /// 
-    /// `FpComplexType<T>` holds iff `T` models `std::complex<U>`for some
-    /// scalar type `U` verifying `FpType<U>`.
+    /// `FpComplexType<T>` holds iff `T` models `std::complex<U>` for some
+    /// scalar type `U` such that `FpType<U>` holds.
     ///  
     ///```c++
     ///
@@ -82,8 +97,8 @@ namespace ffc::core::num {
     /// static_assert(FpComplexType<f64>);
     /// ```
     template <typename T>
-    concept FpComplexType =  FpType<typename T::value_type> 
-        && ComplexType<T>;
+    concept FpComplexType = ComplexType<T> 
+        && FpType<typename std::remove_cvref_t<T>::value_type>;
 } // namespace ffc::core::num.
 
 
