@@ -2,7 +2,7 @@
 
 
 #include <limits>
-#include "ffc/core/num/traits.hpp"
+#include "ffc/core/num/concepts.hpp"
 
 
 namespace ffc::core::num::fp {
@@ -53,7 +53,7 @@ namespace ffc::core::num::fp {
         ///
         /// (...)
         /// ```
-        constexpr auto MAX{std::numeric_limits<T>::max()};
+        static constexpr auto MAX{std::numeric_limits<T>::max()};
 
         /// Smallest positive (normal) value representable as `FpType<T>`.
         ///
@@ -69,7 +69,7 @@ namespace ffc::core::num::fp {
         ///     return std::abs(fp) <= fp::FpTraits<T>::MIN_POSITIVE;
         /// }
         /// ```
-        constexpr auto MIN_POSITIVE{std::numeric_limits<T>::min()}; 
+        static constexpr auto MIN_POSITIVE{std::numeric_limits<T>::min()}; 
 
         /// Smallest finite value that can be represented by `FpType<T>`.
         /// 
@@ -86,19 +86,19 @@ namespace ffc::core::num::fp {
         ///
         /// (...)
         ///```
-        constexpr auto MIN{std::numeric_limits<T>::lowest()};
+        static constexpr auto MIN{std::numeric_limits<T>::lowest()};
 
         /// Positive Infinity.
         ///
         /// `FpTraits<T>::INFINITY` follows ieee754 conventions, in the 
         /// sense that `INFINITY + var = INFINITY` for any `FpType<T>` `var`.
-        constexpr auto INFINITY{std::numeric_limits<T>::infinity()};
+        static constexpr auto INFINITY{std::numeric_limits<T>::infinity()};
 
         /// Negative infinity.
         ///
         /// `FpTraits<T>::NEG_INFINITY` is the additive inverse of INFINITY, 
         /// and follows the same ieee754 conventions.
-        constexpr auto NEG_INFINITY{-std::numeric_limits<T>::infinity()};
+        static constexpr auto NEG_INFINITY{-std::numeric_limits<T>::infinity()};
 
         /// Radix (base) of the fp number internal representation.
         ///
@@ -113,7 +113,7 @@ namespace ffc::core::num::fp {
         /// // strong enforcement of ieee754.
         /// assert(fp::FpTraits<T>::RADIX == 2);
         ///```
-        constexpr auto RADIX{std::numeric_limits<T>::radix};
+        static constexpr auto RADIX{std::numeric_limits<T>::radix};
 
         /// Number of base-10 significant digits. 
         ///
@@ -131,10 +131,10 @@ namespace ffc::core::num::fp {
         /// const f64 unsafe = 1.23456789123456;
         /// // 16th signigicant digit might be lost.
         /// ```
-        constexpr auto DIGITS{std::numeric_limits<T>::digits10};
+        static constexpr auto DIGITS{std::numeric_limits<T>::digits10};
 
         /// Quiet iee754 (i.e., non-signaling) NAN representation.
-        constexpr auto QUIET_NAN{std::numeric_limits<T>::quiet_NaN()};
+        static constexpr auto QUIET_NAN{std::numeric_limits<T>::quiet_NaN()};
         
         /// Machine epsilon for `FpType<T>`.
         ///
@@ -148,12 +148,13 @@ namespace ffc::core::num::fp {
         /// namespace fp = ffc::core::num::fp;
         ///
         /// template <typename T>
-        ///     requires FpType<T>
+        ///     requires 
+        ///         (FpType<T>)
         /// inline bool cmp_approx_eq(T lhs, T rhs) noexcept {
         ///     return (std::abs(lhs - rhs) <= fp::FpTraits<T>::EPSILON * std::abs(lhs);
         /// }
         ///```
-        constexpr auto EPSILON{std::numeric_limits<T>::epsilon()};
+        static constexpr auto EPSILON{std::numeric_limits<T>::epsilon()};
 
         /// Size of `FpType<T>` expressed in bytes.
         ///
@@ -162,12 +163,15 @@ namespace ffc::core::num::fp {
         ///
         /// ```c++
         /// namespace fp = ffc::core::num::fp;
-        /// 
+        ///
         /// template <typename T>
-        ///     requires FpType<T>
-        /// constexpr auto lanes = 32uz / fp::FpTraits<T>::BYTES;
-        constexpr auto BYTES{sizeof(T)};
+        ///     requires 
+        ///         (FpType<T>)
+        /// constexpr auto avx2_fp_lanes = 32uz / fp::FpTraits<T>::BYTES;
+        ///```
+        static constexpr auto BYTES{sizeof(T)};
 
         /// Size of `FpType<T>` expressed in bits.
-        constexpr auto BITS{sizeof(T) * 8uz};
-} // namespace ffc::core::num;
+        static constexpr auto BITS{sizeof(T) * 8uz};
+    }
+} // namespace ffc::core::num.
