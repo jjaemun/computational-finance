@@ -1,96 +1,91 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
+
 #include <limits>
+#include "ffc/core/num/concepts.hpp"
 
-namespace ffc::core::num {
-    // platform dependent.
-    using usize = std::size_t;
-    using isize = std::ptrdiff_t;
 
-    using u8  = std::uint8_t;
-    using u16 = std::uint16_t;
-    using u32 = std::uint32_t;
-    using u64 = std::uint64_t;
+namespace ffc::core::num::integral {
+    /// Constants and properties of integral types.
+    ///
+    /// `IntTraits<T>` represents the canonical source of truth for known 
+    /// properties of an integral type. 
+    ///
+    ///```c++
+    /// namespace integral = ffc::core::num::integral;
+    /// 
+    /// // largest representable i64.
+    /// auto max64i = integral::IntTraits<i64>::MAX;
+    /// // bits for u32.
+    /// auto bits32u = integral::IntTraits<u32>::BITS;
+    ///
+    /// (...) // are all contained.
+    /// ```
+    /// The template is restricted so that instantiating `IntTraits<T>`
+    /// for a non-`IntType<T>` is a hard compile error. 
+    ///
+    ///```c++
+    /// namespace integral = ffc::core::num::integral;
+    ///
+    /// // compiles.
+    /// auto max8i = integral::IntTraits<i8>::MAX;
+    /// // fails.
+    /// auto max32f = integral::IntTraits<f32>::MAX;
+    /// ```
+    template <typename T>
+        requires
+            (IntType<T>)
+    struct IntTraits final {
+        /// Largest value that can be represented by `IntType<T>`.
+        /// 
+        /// `IntTraits<T>::MAX` is useful for upper bound checking or
+        /// sentinel values in running minimum computations.
+        ///
+        ///```c++
+        /// namespace integral = ffc::core::num::integral;
+        ///
+        /// // running min.
+        /// i64 min = integral::IntTraits<i64>::MAX;
+        /// for (auto value : values)
+        ///     min = std::min(min, value);
+        ///
+        /// (...)
+        /// ```
+        static constexpr auto MAX{std::numeric_limits<T>::max()};
 
-    static_assert(sizeof(u8)  == 1uz);
-    static_assert(sizeof(u16) == 2uz);
-    static_assert(sizeof(u32) == 4uz);
-    static_assert(sizeof(u64) == 8uz);
+        /// Smallest value that can be represented by `IntType<T>`.
+        /// 
+        /// `IntTraits<T>::MIN` is useful for lower bound checking or
+        /// sentinel values in running maximum computations.
+        ///
+        ///```c++
+        /// namespace integral = ffc::core::num::integral;
+        ///
+        /// // running max.
+        /// i64 max = integral::IntTraits<i64>::MIN;
+        /// for (auto value : values)
+        ///     max = std::max(max, value);
+        ///
+        /// (...)
+        ///```
+        static constexpr auto MIN{std::numeric_limits<T>::lowest()};
 
-    using i8  = std::int8_t;
-    using i16 = std::int16_t;
-    using i32 = std::int32_t;
-    using i64 = std::int64_t;
+        /// Size of `IntType<T>` expressed in bytes.
+        ///
+        /// Often required for low-level memory (allocation etc.) 
+        /// applications or in SIMD contexts (register packing etc.).
+        ///
+        /// ```c++
+        /// namespace integral = ffc::core::num::integral;
+        ///
+        /// template <typename T>
+        ///     requires 
+        ///         (IntType<T>)
+        /// constexpr auto avx2_int_lanes = 32uz / integral::IntTraits<T>::BYTES;
+        ///```
+        static constexpr auto BYTES{sizeof(T)};
 
-    static_assert(sizeof(i8)  == 1uz);
-    static_assert(sizeof(i16) == 2uz);
-    static_assert(sizeof(i32) == 4uz);
-    static_assert(sizeof(i64) == 8uz);
-
-    namespace integral::usize {
-        constexpr auto MAX{std::numeric_limits<usize>::max()};
-        constexpr auto BYTES{sizeof(usize)};
-        constexpr auto BITS{sizeof(usize) * 8uz};
-    } // namespace integral::usize
-
-    namespace integral::isize {
-        constexpr auto MAX{std::numeric_limits<isize>::max()};
-        constexpr auto MIN{std::numeric_limits<isize>::min()};
-        constexpr auto BYTES{sizeof(isize)};
-        constexpr auto BITS{sizeof(isize) * 8uz};
-    } // namespace integral::isize
-
-    namespace integral::u8 {
-        constexpr auto MAX{std::numeric_limits<u8>::max()};
-        constexpr auto BYTES{sizeof(u8)};
-        constexpr auto BITS{sizeof(u8) * 8uz};
-    } // namespace integral::u8
-
-    namespace integral::u16 {
-        constexpr auto MAX{std::numeric_limits<u16>::max()};
-        constexpr auto BYTES{sizeof(u16)};
-        constexpr auto BITS{sizeof(u16) * 8uz};
-    } // namespace integral::u16
-
-    namespace integral::u32 {
-        constexpr auto MAX{std::numeric_limits<u32>::max()};
-        constexpr auto BYTES{sizeof(u32)};
-        constexpr auto BITS{sizeof(u32) * 8uz};
-    } // namespace integral::u32
-
-    namespace integral::u64 {
-        constexpr auto MAX{std::numeric_limits<u64>::max()};
-        constexpr auto BYTES{sizeof(u64)};
-        constexpr auto BITS{sizeof(u64) * 8uz};
-    } // namespace integral::u64
-
-    namespace integral::i8 {
-        constexpr auto MAX{std::numeric_limits<i8>::max()};
-        constexpr auto MIN{std::numeric_limits<i8>::min()};
-        constexpr auto BYTES{sizeof(i8)};
-        constexpr auto BITS{sizeof(i8) * 8uz};
-    } // namespace integral::i8
-
-    namespace integral::i16 {
-        constexpr auto MAX{std::numeric_limits<i16>::max()};
-        constexpr auto MIN{std::numeric_limits<i16>::min()};
-        constexpr auto BYTES{sizeof(i16)};
-        constexpr auto BITS{sizeof(i16) * 8uz};
-    } // namespace integral::i16
-
-    namespace integral::i32 {
-        constexpr auto MAX{std::numeric_limits<i32>::max()};
-        constexpr auto MIN{std::numeric_limits<i32>::min()};
-        constexpr auto BYTES{sizeof(i32)};
-        constexpr auto BITS{sizeof(i32) * 8uz};
-    } // namespace integral::i32
-
-    namespace integral::i64 {
-        constexpr auto MAX{std::numeric_limits<i64>::max()};
-        constexpr auto MIN{std::numeric_limits<i64>::min()};
-        constexpr auto BYTES{sizeof(i64)};
-        constexpr auto BITS{sizeof(i64) * 8uz};
-    } // namespace integral::i64
-} // namespace ffc::core::num
+        /// Size of `IntType<T>` expressed in bits.
+        static constexpr auto BITS{sizeof(T) * 8uz};
+    };
+} // namespace ffc::core::num::integral.
