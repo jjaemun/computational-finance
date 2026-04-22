@@ -135,7 +135,7 @@ namespace {
         static_assert(
             complex<
                 ffc::c64,
-                ffc::c128,
+                ffc::c128
             >
         );
 
@@ -154,7 +154,7 @@ namespace {
                 ffc::i32,
                 ffc::i64,
 
-                ffc::32,
+                ffc::f32,
                 ffc::f64
             >
         );
