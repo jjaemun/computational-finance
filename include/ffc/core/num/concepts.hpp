@@ -71,10 +71,18 @@ namespace ffc::core::num {
     /// 
     /// `ComplexType<T>` holds iff `T` models `std::complex<U>`
     /// for some valid scalar type `U`.
+    ///
+    ///```c++
+    ///
+    /// // compiles.
+    /// static_assert(ComplexType<i64>);
+    /// // fails.
+    /// static_assert(ComplexType<char>);
+    /// ```
     template <typename T>
     concept ComplexType = requires {
             typename std::remove_cvref_t<T>::value_type; 
-        } &&  std::same_as<
+        } && std::same_as<
                 std::remove_cvref_t<T>, 
                 std::complex<typename std::remove_cvref_t<T>::value_type>>;
 
@@ -94,6 +102,4 @@ namespace ffc::core::num {
     template <typename T>
     concept FpComplexType = ComplexType<T> 
         && FpType<typename std::remove_cvref_t<T>::value_type>;
-} // namespace ffc::core::num.
-
-
+} // namespace ffc::core::num

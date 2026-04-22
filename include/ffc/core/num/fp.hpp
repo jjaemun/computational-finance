@@ -21,6 +21,7 @@ namespace ffc::core::num::fp {
     ///
     /// (...) // are all contained.
     /// ```
+    ///
     /// The template is restricted so that instantiating `FpTraits<T>`
     /// for a non-`FpType<T>` is a hard compile error. 
     ///
@@ -189,4 +190,4 @@ namespace ffc::core::num::fp {
         /// Size of `FpType<T>` expressed in bits.
         static constexpr auto BITS{sizeof(T) * 8uz};
     };
-} // namespace ffc::core::num.
+} // namespace ffc::core::num

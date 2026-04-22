@@ -21,6 +21,7 @@ namespace ffc::core::num::integral {
     ///
     /// (...) // are all contained.
     /// ```
+    ///
     /// The template is restricted so that instantiating `IntTraits<T>`
     /// for a non-`IntType<T>` is a hard compile error. 
     ///
@@ -88,4 +89,4 @@ namespace ffc::core::num::integral {
         /// Size of `IntType<T>` expressed in bits.
         static constexpr auto BITS{sizeof(T) * 8uz};
     };
-} // namespace ffc::core::num::integral.
+} // namespace ffc::core::num::integral
