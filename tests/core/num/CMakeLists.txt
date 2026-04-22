@@ -10,11 +10,12 @@ target_link_libraries(
     ffc
 )
 
-gtest_discover_tests(core_num TESTLIST tests)
-
+gtest_discover_tests(
+    core_numtest TESTLIST 
+    tests
+)
 
 set_tests_properties(
     ${tests} PROPERTIES LABELS 
     "core"
 )
-
