@@ -1,7 +1,8 @@
 #pragma once
 
 
-#include "ffc/core/num/concept.hpp"
+#include "ffc/core/num/concepts.hpp"
+#include "ffc/core/num/consts.hpp"
 #include "ffc/core/num/traits.hpp"
 #include "ffc/core/num/integral.hpp"
 #include "ffc/core/num/fp.hpp"
