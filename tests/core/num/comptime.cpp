@@ -56,7 +56,7 @@ namespace {
 
     TEST(comptime, IntTypeSignednessConcept) {
         static_assert(
-            signedints <
+            signedints<
                 ffc::isize,
                 
                 ffc::i8,
@@ -67,7 +67,7 @@ namespace {
         );
             
         static_assert(
-            unsignedints <
+            unsignedints<
                 ffc::usize,
                 
                 ffc::u8,
