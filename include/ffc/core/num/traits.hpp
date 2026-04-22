@@ -37,6 +37,9 @@ namespace ffc::core::num {
         requires
             (IntType<T>)
     struct IntTraits final {
+        // `IntType<T>` type alias.
+        using Type = T;
+
         /// Largest value that can be represented by `IntType<T>`.
         /// 
         /// `IntTraits<T>::MAX` is useful for upper bound checking or
@@ -121,6 +124,9 @@ namespace ffc::core::num {
         requires
             (FpType<T>)
     struct FpTraits final {
+        /// `FpType<T>` type alias.
+        using Type = T;
+
         /// Largest finite value that can be represented by `FpType<T>`.
         /// 
         /// `FpTraits<T>::MAX` is useful for upper finite bound checking or
@@ -283,8 +289,8 @@ namespace ffc::core::num {
     ///```c++
     /// namespace num = ffc::core::num;
     /// 
-    /// // bits for c64.
-    /// auto bits64c = num::ComplexTraits<c64>::BITS;
+    /// // scalar component type of c64.
+    /// using scalar64c = num::ComplexTraits<c64>::ScalarType;
     /// // bytes for a c128.
     /// auto bytes128c = num::ComplexTraits<c128>::BYTES;
     ///
@@ -304,7 +310,7 @@ namespace ffc::core::num {
     /// // compiles.
     /// auto bytes64c = num::ComplexTraits<c64>::BYTES;
     /// // fails.
-    /// auto bits32f = num::ComplexTraits<f32>::BITS;
+    /// using scalar32f = num::ComplexTraits<f32>::ScalarType;
     /// ```
     template <typename T>
         requires

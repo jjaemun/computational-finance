@@ -75,7 +75,7 @@ namespace ffc::core::num {
     ///```c++
     ///
     /// // compiles.
-    /// static_assert(ComplexType<i64>);
+    /// static_assert(ComplexType<c64>);
     /// // fails.
     /// static_assert(ComplexType<char>);
     /// ```
