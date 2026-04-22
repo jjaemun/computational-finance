@@ -16,13 +16,12 @@ namespace ffc::core::num::fp {
     /// 
     /// // largest finite f64.
     /// auto max64f = fp::FpTraits<f64>::MAX;
-    /// // macheps for f32.
+    /// // machine epsilon for f32.
     /// auto eps32f = fp::FpTraits<f32>::EPSILON;
     ///
     /// (...) // are all contained.
     /// ```
-    ///
-    /// The primary template is undefined so that instantiating `FpTraits<T>`
+    /// The template is restricted so that instantiating `FpTraits<T>`
     /// for a non-`FpType<T>` is a hard compile error. 
     ///
     ///```c++
@@ -39,7 +38,7 @@ namespace ffc::core::num::fp {
     struct FpTraits final {
         /// Largest finite value that can be represented by `FpType<T>`.
         /// 
-        /// `FpTraits<T>::MAX` is useful for overflow bound checking or
+        /// `FpTraits<T>::MAX` is useful for upper finite bound checking or
         /// sentinel values in running minimum computations.
         ///
         ///```c++
@@ -54,10 +53,10 @@ namespace ffc::core::num::fp {
         /// ```
         static constexpr auto MAX{std::numeric_limits<T>::max()};
 
-        /// Smallest positive (normal) value representable as `FpType<T>`.
+        /// Smallest positive normal value representable as `FpType<T>`.
         ///
-        /// `FpTraits<T>::MIN_POSITIVE` is the normal value closest to zero 
-        ///  therefore it is the safe threshold for fp absolute comparisons near it.
+        /// `FpTraits<T>::MIN_POSITIVE` is the *normal* value closest to zero. 
+        ///  Can be used as a threshold for fp absolute comparisons near it.
         ///
         ///```c++
         /// namespace fp = ffc::core::num::fp;
@@ -72,7 +71,7 @@ namespace ffc::core::num::fp {
 
         /// Smallest finite value that can be represented by `FpType<T>`.
         /// 
-        /// `FpTraits<T>::MIN` is useful for underflow bound checking or
+        /// `FpTraits<T>::MIN` is useful for lower finite bound checking or
         /// sentinel values in running maximum computations.
         ///
         ///```c++
@@ -102,7 +101,7 @@ namespace ffc::core::num::fp {
         /// Radix (base) of the fp number internal representation.
         ///
         /// ieee754 fp numbers should have binary (2) radix. For tracing
-        /// purposes only, to check whether the bit masks below are valid.
+        /// purposes mostly.
         ///
         ///```c++
         /// #include <cassert>
@@ -114,25 +113,42 @@ namespace ffc::core::num::fp {
         ///```
         static constexpr auto RADIX{std::numeric_limits<T>::radix};
 
-        /// Number of base-10 significant digits. 
+        /// Number of base-10 significant digits that can be represented 
+        /// without change. 
         ///
-        /// A round-trip `f64` -> decimal -> `f64` conversion is lossless
-        /// with at most `FpTraits<T>::DIGITS` significant digits. 
-        ///
-        /// ```c++
-        ///
-        /// // safe! 
-        /// const f64 safe = 1.2345678912345;
-        /// // 15 signigicant digits preserved.
-        /// assert(safe == 1.2345678912345);
-        ///
-        /// // unsafe!
-        /// const f64 unsafe = 1.23456789123456;
-        /// // 16th signigicant digit might be lost.
-        /// ```
+        /// `FpTraits<T>::DIGITS` is a conservative measure of decimal 
+        /// precision. Additional decimals may not be preserved exactly.
         static constexpr auto DIGITS{std::numeric_limits<T>::digits10};
 
-        /// Quiet iee754 (i.e., non-signaling) NAN representation.
+        /// Number of base-10 significant digits required to preserve 
+        /// identity. 
+        ///
+        /// The following are equivalent:
+        /// - `FpType<T>` satisfy uniqueness up to MAX_DIGITS significant 
+        ///    digits.
+        /// - Round-trip `FpType<T>` -> decimal -> `FpType<T>` conversions 
+        ///   are lossless iff `FpType<T>` holds MAX_DIGITS.
+        ///
+        /// ```c++
+        /// #include <cassert>
+        /// #include <sstream>
+        /// #include <iomanip>
+        ///
+        /// namespace fp = ffc::core::num::fp;
+        ///
+        /// const f64 value = 1.0 / 10.0;
+        /// std::ostringstream output;
+        /// output << std::setprecision(fp::FpTraits<f64>::MAX_DIGITS) << value;
+        ///
+        /// std::istringstream input{output.str()};
+        /// f64 recovered{};
+        /// input >> recovered;
+        ///
+        /// assert(value == recovered);
+        /// ```
+        static constexpr auto MAX_DIGITS{std::numeric_limits<T>::max_digits10};
+
+        /// Quiet ieee754 (i.e., non-signaling) NAN representation.
         static constexpr auto QUIET_NAN{std::numeric_limits<T>::quiet_NaN()};
         
         /// Machine epsilon for `FpType<T>`.
