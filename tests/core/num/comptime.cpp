@@ -161,4 +161,37 @@ namespace {
 
         EXPECT_TRUE(true);
     }
+
+    template <typename T, ffc::usize N>
+    struct type final {
+        using U = T;
+        static constexpr auto M = N;
+    };
+
+    template <typename... Types>
+    constexpr bool bytes = ((sizeof(typename Types::U) == Types::M) && ...);
+    
+    TEST(comptime, TypeByteSize) {
+        static_assert(
+            bytes<
+                type<ffc::u8, 1>,
+                type<ffc::u16, 2>,
+                type<ffc::u32, 4>,
+                type<ffc::u64, 8>,
+        
+                type<ffc::i8, 1>,
+                type<ffc::i16, 2>,
+                type<ffc::i32, 4>,
+                type<ffc::i64, 8>,
+
+                type<ffc::f32, 4>,
+                type<ffc::f64, 8>,
+
+                type<ffc::c64, 8>,
+                type<ffc::c128, 16>
+            >
+        );
+
+        EXPECT_TRUE(true);
+    }
 }
