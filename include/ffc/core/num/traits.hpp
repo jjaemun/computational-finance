@@ -12,12 +12,12 @@ namespace ffc::core::num {
     /// properties of an integral type. 
     ///
     ///```c++
-    /// namespace integral = ffc::core::num::integral;
+    /// namespace num = ffc::core::num;
     /// 
     /// // largest representable i64.
-    /// auto max64i = integral::IntTraits<i64>::MAX;
+    /// auto max64i = num::IntTraits<i64>::MAX;
     /// // bits for u32.
-    /// auto bits32u = integral::IntTraits<u32>::BITS;
+    /// auto bits32u = num::IntTraits<u32>::BITS;
     ///
     /// (...) // are all contained.
     /// ```
@@ -26,12 +26,12 @@ namespace ffc::core::num {
     /// for a non-`IntType<T>` is a hard compile error. 
     ///
     ///```c++
-    /// namespace integral = ffc::core::num::integral;
+    /// namespace num = ffc::core::num;
     ///
     /// // compiles.
-    /// auto max8i = integral::IntTraits<i8>::MAX;
+    /// auto max8i = num::IntTraits<i8>::MAX;
     /// // fails.
-    /// auto max32f = integral::IntTraits<f32>::MAX;
+    /// auto max32f = num::IntTraits<f32>::MAX;
     /// ```
     template <typename T>
         requires
@@ -43,10 +43,10 @@ namespace ffc::core::num {
         /// sentinel values in running minimum computations.
         ///
         ///```c++
-        /// namespace integral = ffc::core::num::integral;
+        /// namespace num = ffc::core::num;
         ///
         /// // running min.
-        /// i64 min = integral::IntTraits<i64>::MAX;
+        /// i64 min = num::IntTraits<i64>::MAX;
         /// for (auto value : values)
         ///     min = std::min(min, value);
         ///
@@ -60,10 +60,10 @@ namespace ffc::core::num {
         /// sentinel values in running maximum computations.
         ///
         ///```c++
-        /// namespace integral = ffc::core::num::integral;
+        /// namespace num = ffc::core::num;
         ///
         /// // running max.
-        /// i64 max = integral::IntTraits<i64>::MIN;
+        /// i64 max = num::IntTraits<i64>::MIN;
         /// for (auto value : values)
         ///     max = std::max(max, value);
         ///
@@ -77,12 +77,12 @@ namespace ffc::core::num {
         /// applications or in SIMD contexts (register packing etc.).
         ///
         /// ```c++
-        /// namespace integral = ffc::core::num::integral;
+        /// namespace num = ffc::core::num;
         ///
         /// template <typename T>
         ///     requires 
         ///         (IntType<T>)
-        /// constexpr auto avx2_int_lanes = 32uz / integral::IntTraits<T>::BYTES;
+        /// constexpr auto avx2_int_lanes = 32uz / num::IntTraits<T>::BYTES;
         ///```
         static constexpr auto BYTES{sizeof(T)};
 
@@ -96,12 +96,12 @@ namespace ffc::core::num {
     /// properties of a fp type. 
     ///
     ///```c++
-    /// namespace fp = ffc::core::num::fp;
+    /// namespace num = ffc::core::num;
     /// 
     /// // largest finite f64.
-    /// auto max64f = fp::FpTraits<f64>::MAX;
+    /// auto max64f = num::FpTraits<f64>::MAX;
     /// // machine epsilon for f32.
-    /// auto eps32f = fp::FpTraits<f32>::EPSILON;
+    /// auto eps32f = num::FpTraits<f32>::EPSILON;
     ///
     /// (...) // are all contained.
     /// ```
@@ -110,12 +110,12 @@ namespace ffc::core::num {
     /// for a non-`FpType<T>` is a hard compile error. 
     ///
     ///```c++
-    /// namespace fp = ffc::core::num::fp;
+    /// namespace num = ffc::core::num;
     ///
     /// // compiles.
-    /// auto max32f = fp::FpTraits<f32>::MAX;
+    /// auto max32f = num::FpTraits<f32>::MAX;
     /// // fails.
-    /// auto max8i = fp::FpTraits<i8>::MAX;
+    /// auto max8i = num::FpTraits<i8>::MAX;
     /// ```
     template <typename T>
         requires
@@ -127,10 +127,10 @@ namespace ffc::core::num {
         /// sentinel values in running minimum computations.
         ///
         ///```c++
-        /// namespace fp = ffc::core::num::fp;
+        /// namespace num = ffc::core::num;
         ///
         /// // running min.
-        /// f64 min = fp::FpTraits<f64>::MAX;
+        /// f64 min = num::FpTraits<f64>::MAX;
         /// for (auto val : values)
         ///     min = std::min(min, val);
         ///
@@ -144,12 +144,12 @@ namespace ffc::core::num {
         ///  Can be used as a threshold for fp absolute comparisons near it.
         ///
         ///```c++
-        /// namespace fp = ffc::core::num::fp;
+        /// namespace num = ffc::core::num;
         ///
         /// template <typename T>
         ///     requires FpType<T>
         /// inline bool near_zero(T fp) noexcept {
-        ///     return std::abs(fp) <= fp::FpTraits<T>::MIN_POSITIVE;
+        ///     return std::abs(fp) <= num::FpTraits<T>::MIN_POSITIVE;
         /// }
         /// ```
         static constexpr auto MIN_POSITIVE{std::numeric_limits<T>::min()}; 
@@ -160,10 +160,10 @@ namespace ffc::core::num {
         /// sentinel values in running maximum computations.
         ///
         ///```c++
-        /// namespace fp = ffc::core::num::fp;
+        /// namespace num = ffc::core::num;
         ///
         /// // running max.
-        /// f64 max = fp::FpTraits<f64>::MIN;
+        /// f64 max = num::FpTraits<f64>::MIN;
         /// for (auto val : values)
         ///     max = std::max(max, val);
         ///
@@ -191,10 +191,10 @@ namespace ffc::core::num {
         ///```c++
         /// #include <cassert>
         ///
-        /// namespace fp = ffc::core::num::fp;
+        /// namespace num = ffc::core::num;
         /// 
         /// // strong enforcement of ieee754.
-        /// assert(fp::FpTraits<T>::RADIX == 2);
+        /// assert(num::FpTraits<T>::RADIX == 2);
         ///```
         static constexpr auto RADIX{std::numeric_limits<T>::radix};
 
@@ -219,11 +219,11 @@ namespace ffc::core::num {
         /// #include <sstream>
         /// #include <iomanip>
         ///
-        /// namespace fp = ffc::core::num::fp;
+        /// namespace num = ffc::core::num;
         ///
         /// const f64 value = 1.0 / 10.0;
         /// std::ostringstream output;
-        /// output << std::setprecision(fp::FpTraits<f64>::MAX_DIGITS) << value;
+        /// output << std::setprecision(num::FpTraits<f64>::MAX_DIGITS) << value;
         ///
         /// std::istringstream input{output.str()};
         /// f64 recovered{};
@@ -245,13 +245,13 @@ namespace ffc::core::num {
         /// ** Use MIN_POSITIVE instead for absolute comparisons near zero **
         ///
         ///```c++
-        /// namespace fp = ffc::core::num::fp;
+        /// namespace num = ffc::core::num;
         ///
         /// template <typename T>
         ///     requires 
         ///         (FpType<T>)
         /// inline bool cmp_approx_eq(T lhs, T rhs) noexcept {
-        ///     return std::abs(lhs - rhs) <= fp::FpTraits<T>::EPSILON * std::abs(lhs);
+        ///     return std::abs(lhs - rhs) <= num::FpTraits<T>::EPSILON * std::abs(lhs);
         /// }
         ///```
         static constexpr auto EPSILON{std::numeric_limits<T>::epsilon()};
@@ -262,12 +262,12 @@ namespace ffc::core::num {
         /// applications or in SIMD contexts (register packing etc.).
         ///
         /// ```c++
-        /// namespace fp = ffc::core::num::fp;
+        /// namespace num = ffc::core::num;
         ///
         /// template <typename T>
         ///     requires 
         ///         (FpType<T>)
-        /// constexpr auto avx2_fp_lanes = 32uz / fp::FpTraits<T>::BYTES;
+        /// constexpr auto avx2_fp_lanes = 32uz / num::FpTraits<T>::BYTES;
         ///```
         static constexpr auto BYTES{sizeof(T)};
 
@@ -281,12 +281,12 @@ namespace ffc::core::num {
     /// known properties of any complex type. 
     ///
     ///```c++
-    /// namespace complex = ffc::core::num::complex;
+    /// namespace num = ffc::core::num;
     /// 
     /// // bits for c64.
-    /// auto bits64c = complex::ComplexTraits<c64>::BITS;
+    /// auto bits64c = num::ComplexTraits<c64>::BITS;
     /// // bytes for a c128.
-    /// auto bytes128c = complex::ComplexTraits<c128>::BYTES;
+    /// auto bytes128c = num::ComplexTraits<c128>::BYTES;
     ///
     /// (...) // are all contained.
     /// ```
@@ -299,17 +299,17 @@ namespace ffc::core::num {
     /// for a non-`ComplexType<T>` is a hard compile error. 
     ///
     ///```c++
-    /// namespace complex = ffc::core::num::complex;
+    /// namespace num = ffc::core::num;
     ///
     /// // compiles.
-    /// auto bytes64c = complex::ComplexTraits<c64>::BYTES;
+    /// auto bytes64c = num::ComplexTraits<c64>::BYTES;
     /// // fails.
-    /// auto bits32f = complex::ComplexTraits<f32>::BITS;
+    /// auto bits32f = num::ComplexTraits<f32>::BITS;
     /// ```
     template <typename T>
         requires
             (ComplexType<T>)
-    struct ComplexTraits {
+    struct ComplexTraits final {
         /// `ComplexType<T>` type alias.
         using Type = T;
         
@@ -322,14 +322,14 @@ namespace ffc::core::num {
         /// applications or fixed-width storage assumptions.
         ///
         /// ```c++
-        /// namespace complex = ffc::core::num::complex;
+        /// namespace num = ffc::core::num;
         ///
         /// // byte offset needed to advance n `ComplexType<T>` elements.
         /// template <typename T>
         ///     requires 
         ///         (ComplexType<T>)
         /// constexpr auto offset_as_bytes(T n) noexcept {
-        ///     return complex::ComplexTraits<T>::BYTES * n;
+        ///     return num::ComplexTraits<T>::BYTES * n;
         /// }
         ///```
         static constexpr auto BYTES{sizeof(T)};
@@ -338,3 +338,4 @@ namespace ffc::core::num {
         static constexpr auto BITS{sizeof(T) * 8uz};
     };
 } // namespace ffc::core::num
+
