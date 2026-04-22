@@ -15,7 +15,6 @@ namespace ffc::core::num {
     ///
     /// // compiles.
     /// static_assert(IntType<i32>);
-    ///
     /// // fails.
     /// static_assert(IntType<f64>);
     /// ```
@@ -31,7 +30,6 @@ namespace ffc::core::num {
     ///
     /// // compiles.
     /// static_assert(SignedIntType<i32>);
-    ///
     /// // fails.
     /// static_assert(SignedIntType<u32>);
     /// ```
@@ -48,7 +46,6 @@ namespace ffc::core::num {
     ///
     /// // compiles.
     /// static_assert(UnsignedIntType<u32>);
-    ///
     /// // fails.
     /// static_assert(UnsignedIntType<i32>);
     /// ```
@@ -64,7 +61,6 @@ namespace ffc::core::num {
     ///
     /// // compiles.
     /// static_assert(FpType<f32>);
-    ///
     /// // fails.
     /// static_assert(FpType<i64>);
     /// ```
@@ -92,7 +88,6 @@ namespace ffc::core::num {
     ///
     /// // compiles.
     /// static_assert(FpComplexType<c64>);
-    ///
     /// // fails.
     /// static_assert(FpComplexType<f64>);
     /// ```
