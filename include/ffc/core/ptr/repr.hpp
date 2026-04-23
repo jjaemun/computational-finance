@@ -51,7 +51,7 @@ namespace ffc::core::ptr::repr {
     /// `repr::iptr` aliases `std::intptr_t`, which is an *optional*, implementation
     /// defined signed integer capable of holding pointer values.
     ///
-    /// It is only a raw representation type for pointer-address arithmetic. In 
+    /// It is only a raw representation type for signed pointer arithmetic. In 
     /// `ffc::core::ptr` it provides an explicit signed integer type for e.g., pointer
     /// displacement operations, whenever unrelated to sizes, counts, or indices.
     ///
@@ -65,7 +65,7 @@ namespace ffc::core::ptr::repr {
     /// };
     ///
     /// Foo *foo = new Foo{};
-    /// repr::uptr addr = reinterpret_cast<repr::uptr>(foo);
+    /// repr::iptr addr = reinterpret_cast<repr::iptr>(foo);
     /// 
     /// // move integer repr by one signed cacheline offset
     /// repr::iptr preceding = addr - CACHELINE64BIT;
