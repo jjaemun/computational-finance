@@ -38,8 +38,8 @@ namespace ffc::core::ptr::repr {
     /// dereferenceability, or provenance. It should not be taken as a portable
     /// physical address format, but rather a low-level primitive for pointer machinery.
     /// 
-    /// A numeric value alone is *not* sufficient to establish that a converted
-    /// pointer may be safely dereferenced.
+    /// A numeric value alone is *not* sufficient to establish that
+    /// a converted pointer may be safely dereferenced.
     using uptr = std::uintptr_t;
 
     #if !(defined(INTPTR_MAX))
@@ -75,7 +75,7 @@ namespace ffc::core::ptr::repr {
     /// dereferenceability, or provenance. It should not be taken as a portable
     /// physical address format, but rather a low-level primitive for pointer machinery.
     /// 
-    /// A numeric value alone is *not* sufficient to establish that a converted
-    /// pointer may be safely dereferenced.
+    /// A numeric value alone is *not* sufficient to establish that 
+    /// a converted pointer may be safely dereferenced.
     using iptr = std::intptr_t;
 } // namespace ffc::core::ptr::repr
