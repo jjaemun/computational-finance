@@ -266,12 +266,12 @@ namespace ffc::core::ptr {
         /// //   Equivalently (e.g., in an LP-64 system):
         /// //   
         /// //   /    usize bytes = count * sizeof(T);
-        /// //   |                  ----------------- ((2^64) + 1) overflows 64-bits \
-        /// //   |                                    and wraps to min value.
+        /// //   |                  ----------------- ((2^64) + 1) overflows 64-bits and \
+        /// //   |                                    wraps to min value.
         /// //   | 
         /// //   |    uptr RET = addr.byte_add(bytes);
-        /// //   |         ^~~ now binds to wrapped value and no longer models the \
-        /// //   |             intended address. 
+        /// //   |         ^~~   ~~~~~~~~~~~~~~~~~~~~ now binds to wrapped value and no  \
+        /// //   |                                    longer models the intended address.
         /// //   |___ 
         /// ```
         template <typename T>
@@ -329,13 +329,13 @@ namespace ffc::core::ptr {
         /// //   Equivalently (e.g., in an LP-64 system):
         /// //
         /// //   /    usize bytes = count * sizeof(T);
-        /// //   |                  ----------------- ((2^64) + 1) overflows 64 bits \
-        /// //   |                                    and wraps to min value.
+        /// //   |                  ----------------- ((2^64) + 1) overflows 64 bits and \
+        /// //   |                                    wraps to min value.
         /// //   |
-        /// //   |    uptr RET = addr.byte_sub(bytes);
-        /// //   |         ^~~ now binds to wrapped value and no longer models the \
-        /// //   |             intended address.
-        /// //   |___
+        /// //   |    uptr RET = addr.byte_add(bytes);
+        /// //   |         ^~~   ~~~~~~~~~~~~~~~~~~~~ now binds to wrapped value and no  \
+        /// //   |                                    longer models the intended address.
+        /// //   |___ 
         /// ```
         template <typename T>
         [[nodiscard]]
