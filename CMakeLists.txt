@@ -3,7 +3,7 @@ project(ffc)
 
 
 set(CMAKE_CXX_STANDARD 23)
-set(CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
 add_library(ffc INTERFACE)
