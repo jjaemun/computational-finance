@@ -24,7 +24,7 @@ namespace ffc::core::ptr::repr {
     /// const repr::uptr ALIGNMASK{63u};
     ///
     /// struct Foo { 
-    ///     int bar; 
+    ///     i32 bar; 
     /// };
     ///
     /// Foo *foo = new Foo{};
@@ -61,17 +61,17 @@ namespace ffc::core::ptr::repr {
     /// const repr::iptr BIT64CACHELINE{64};
     ///
     /// struct Foo { 
-    ///     int bar; 
+    ///     i32 bar; 
     /// };
     ///
     /// Foo *foo = new Foo{};
     /// repr::iptr addr = reinterpret_cast<repr::iptr>(foo);
     /// 
     /// // move integer repr by one signed cacheline offset
-    /// repr::iptr preceding = addr - CACHELINE64BIT;
+    /// repr::iptr preceding = addr - BIT64CACHELINE;
     /// ```
     ///
-    /// `repr::uptr` does not hold any implications about ownership, lifetime, validity,
+    /// `repr::iptr` does not hold any implications about ownership, lifetime, validity,
     /// dereferenceability, or provenance. It should not be taken as a portable
     /// physical address format, but rather a low-level primitive for pointer machinery.
     /// 

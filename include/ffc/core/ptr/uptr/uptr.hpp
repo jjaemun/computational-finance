@@ -9,7 +9,7 @@ namespace ffc::core::ptr {
     /// Strong unsigned integer representation of a pointer value.
     ///
     /// `uptr` wraps `ffc::core::ptr::repr::uptr` to provide an explicit type
-    /// for byte pointer-representation arithmetic. 
+    /// for byte-oriented pointer-representation arithmetic.
     ///
     /// `uptr` is the internal means for:
     /// - Explicit pointer-to-integer repr conversion
@@ -41,16 +41,16 @@ namespace ffc::core::ptr {
     ///```
     ///
     /// Operations are on integer representations of pointer values and therefore
-    /// do not establish that any converted pointer can be safely to dereferenced.
+    /// do not establish that any converted pointer can be safely dereferenced.
     class uptr final {
     private:
         repr::uptr value{};
             
     public:
-        /// Default-constructs of a zero-valued pointer representation.
+        /// Default-constructs a zero-valued pointer representation.
         ///
-        /// The underlying member `value` uses its in-class value-initializer preventing
-        /// an unspecified raw representation, i.e., garbage bit values.
+        /// The underlying member `value` uses its in-class value-initializer,
+        /// preventing an unspecified raw representation, i.e., garbage bit values.
         /// 
         /// ```c++
         /// using namespace ffc::core::ptr;
@@ -61,13 +61,13 @@ namespace ffc::core::ptr {
         /// uptr{};
         ///```
         ///
-        /// `uptr` is therefore both `default` and `nothrow` default-constructible. 
+        /// `uptr` is therefore both `default` and `nothrow` default-constructible.
         constexpr uptr() noexcept = default;
        
         /// Constructs `uptr` from raw `repr::uptr` unsigned pointer representation.
         ///
-        /// It enforces that raw integers are not implicitly cast as address
-        /// values. 
+        /// It is marked `explicit` so that raw integer representations are not
+        /// implicitly cast as address-style values.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
@@ -84,21 +84,26 @@ namespace ffc::core::ptr {
         constexpr explicit uptr(repr::uptr value_) noexcept 
             : value{value_} {} 
 
-        /// Constructs zero-valued `uptr` unsigned pointer representation.
+        
+        /// Constructs `uptr` from a `usize`.
         ///
-        /// `uptr::zero()` is equivalent to the default construcutor, only 
-        /// more explicit, and clearer.
+        /// `uptr::from_usize()` is a convenience named-constructor whenever the source
+        /// is already expressed in the framework's unsigned size/count type.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
-        ///
-        /// auto nullish = uptr::zero();
+        /// 
+        /// usize addr{0xff};
+        /// auto faddr = uptr::from_usize(addr);
         /// ```
+        /// 
+        /// Conversion is only in terms of representation. It does not preserve a valid
+        /// pointer state or safe dereferenceability.
         [[nodiscard]]
-        static constexpr uptr zero() noexcept {
-            return uptr{};
+        static constexpr uptr from_usize(usize addr) noexcept {
+            return uptr{static_cast<repr::uptr>(addr)};
         }
-
+        
         /// Constructs `uptr` from an object pointer.
         ///
         /// `uptr::from_ptr()` is the preferred named-constructor whenever the source
@@ -138,7 +143,22 @@ namespace ffc::core::ptr {
         static uptr from_const_ptr(const T *ptr) noexcept {
             return uptr{reinterpret_cast<repr::uptr>(ptr)};
         }
-   
+       
+        /// Constructs zero-valued `uptr` unsigned pointer representation.
+        ///
+        /// `uptr::zero()` is equivalent to default construction, but can be
+        /// clearer at call site when an explicit zero representation is intended.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// auto nullish = uptr::zero();
+        /// ```
+        [[nodiscard]]
+        static constexpr uptr zero() noexcept {
+            return uptr{};
+        }
+
         /// Converts the stored `repr::uptr` unsigned representation to `T*`.
         ///
         /// If the address modelled by `uptr` is not valid, out of bounds, or unsafe to 
@@ -177,7 +197,7 @@ namespace ffc::core::ptr {
             return reinterpret_cast<T const*>(value);
         }
         
-        /// Returns the underlying raw underlying `repr::uptr`.
+        /// Returns the underlying raw `repr::uptr`.
         ///
         /// It is the value-returning accessor for the stored unsigned representation.
         ///
@@ -196,9 +216,9 @@ namespace ffc::core::ptr {
 
         /// Returns an immutable reference to the underlying raw `repr::uptr`.
         ///
-        /// Should be preferred only for direct immutable access to the underlying
-        /// representation is required without copying. Because `repr::uptr` is trivially
-        /// copyable, it should be used sparsely and intently instead of `to_unsigned()`.
+        /// This accessor should be preferred only when direct immutable access
+        /// to the stored representation is required. Because `repr::uptr` is
+        /// trivially copyable, `to_unsigned()` is generally the clearer default.
         [[nodiscard]]
         constexpr repr::uptr const &as_unsigned() const noexcept {
             return value;
@@ -239,8 +259,9 @@ namespace ffc::core::ptr {
         
         /// Returns a new `uptr` advanced by `count` elements of `T`.
         ///
-        /// Adds an unsigned typed offset to a pointer representation. It is equivalent 
-        /// to advancing underlying representation by `count * sizeof(T)` bytes.
+        /// Adds an unsigned typed offset to a pointer representation. It is
+        /// equivalent to advancing the underlying representation by
+        /// `count * sizeof(T)` bytes.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
@@ -250,8 +271,9 @@ namespace ffc::core::ptr {
         /// uptr advanced = addr.add<i64>(2uz);
         /// ```
         ///
-        /// This operation is unchecked. If the offset when computed as bytes overflows a 
-        /// `usize`, the value wraps, invoking specified but undesired behaviour.
+        /// This operation is unchecked. If the offset, when computed in bytes,
+        /// overflows `usize`, the value wraps, invoking specified but undesired
+        /// behaviour.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
@@ -266,12 +288,13 @@ namespace ffc::core::ptr {
         /// //   Equivalently (e.g., in an LP-64 system):
         /// //   
         /// //   /    usize bytes = count * sizeof(T);
-        /// //   |                  ----------------- ((2^64) + 1) overflows 64-bits and \
+        /// //   |                  ----------------- ((2^64) + 1) overflows 64 bits and \
         /// //   |                                    wraps to min value.
         /// //   | 
         /// //   |    uptr RET = addr.byte_add(bytes);
-        /// //   |         ^~~   ~~~~~~~~~~~~~~~~~~~~ now binds to wrapped value and no  \
-        /// //   |                                    longer models the intended address.
+        /// //   |         ^~~   ~~~~~~~~~~~~~~~~~~~~ now binds the wrapped byte offset  \
+        /// //   |                                    and no longer models the intended  \
+        /// //   |                                    displacement.
         /// //   |___ 
         /// ```
         template <typename T>
@@ -280,7 +303,7 @@ namespace ffc::core::ptr {
             return byte_add(count * sizeof(T));
         }
 
-        /// Returns a new `uptr` regressed by `count` bytes.
+        /// Returns a new `uptr` moved backward by `count` bytes.
         ///
         /// Subtracts an unsigned byte offset from a pointer representation.
         ///
@@ -302,7 +325,7 @@ namespace ffc::core::ptr {
         /// Returns a new `uptr` moved backward by `count` elements of `T`.
         ///
         /// Subtracts an unsigned typed offset from a pointer representation. It is
-        /// equivalent to regressing underlying representation by
+        /// equivalent to regressing the underlying representation by
         /// `count * sizeof(T)` bytes.
         ///
         /// ```c++
@@ -313,8 +336,9 @@ namespace ffc::core::ptr {
         /// uptr regressed = addr.sub<i64>(2uz);
         /// ```
         ///
-        /// This operation is unchecked. If the offset when computed as bytes overflows a
-        /// `usize`, the value wraps, invoking specified but undesired behaviour.
+        /// This operation is unchecked. If the offset, when computed in bytes,
+        /// overflows `usize`, the value wraps, invoking specified but undesired
+        /// behaviour.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
@@ -332,9 +356,10 @@ namespace ffc::core::ptr {
         /// //   |                  ----------------- ((2^64) + 1) overflows 64 bits and \
         /// //   |                                    wraps to min value.
         /// //   |
-        /// //   |    uptr RET = addr.byte_add(bytes);
-        /// //   |         ^~~   ~~~~~~~~~~~~~~~~~~~~ now binds to wrapped value and no  \
-        /// //   |                                    longer models the intended address.
+        /// //   |    uptr RET = addr.byte_sub(bytes);
+        /// //   |         ^~~   ~~~~~~~~~~~~~~~~~~~~ now binds the wrapped byte offset  \
+        /// //   |                                    and no longer models the intended  \
+        /// //   |                                    displacement.
         /// //   |___ 
         /// ```
         template <typename T>
@@ -342,28 +367,28 @@ namespace ffc::core::ptr {
         constexpr uptr sub(usize count) const noexcept {
             return byte_sub(count * sizeof(T));
         }
-
+        
         /// Returns a new `uptr` displaced by signed byte offset.
         ///
-        /// Positive values advance the representation, while negative values
-        /// move it backward.
+        /// Positive values advance the representation, while negative values regress it.
         ///
         /// ```c++
+        /// #include <cassert>
         /// using namespace ffc::core::ptr;
+        /// 
+        /// constexpr isize BIT32STRIDE{32};
         ///
-        /// i64 foo{};
-        /// uptr addr = uptr::from_ptr(&foo);
-        ///
-        /// uptr fore = addr.offset_bytes(32);
-        /// uptr back = addr.offset_bytes(-16);
+        /// uptr nullish = uptr::zero();
+        /// uptr advanced = addr.offset_bytes(BIT32STRIDE);
+        /// // do something (...) and regress it.
+        /// uptr regressed = fore.offset_bytes(-BIT32STRIDE);
+        /// 
+        /// assert(nullish.to_unsigned() == back.to_unsigned());
         /// ```
         ///
-        template <typename T>
-        [[nodiscard]]
-        constexpr uptr offset(isize count) const noexcept {
-            return offset_bytes(count * static_cast<isize>(sizeof(T)));
-        }
-
+        /// This operation has conditional branching and delegates to `byte_add()` and
+        /// `byte_sub()`. Negative signed offsets are therefore not converted into unsigned
+        /// unsigned representations before the displacement is applied.
         [[nodiscard]]
         constexpr uptr offset_bytes(isize bytes) const noexcept {
             if (bytes >= 0)
@@ -411,7 +436,19 @@ namespace ffc::core::ptr {
         }
 
         /// Returns signed byte displacement from the current representation
-        /// to `origin`.
+        /// to pointer `origin`.
+        ///
+        /// This is a convenience wrapper over `byte_offset_from(uptr)`. The
+        /// result is computed as `origin - current`, expressed in bytes.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// i64 values[4]{};
+        ///
+        /// uptr current = uptr::from_ptr(&values[2]);
+        /// isize disp = current.byte_offset_from_ptr(&values[0]);
+        /// ```
         template <typename T>
         [[nodiscard]]
         constexpr isize byte_offset_from_ptr(T *origin) const noexcept {
@@ -419,7 +456,19 @@ namespace ffc::core::ptr {
         }
 
         /// Returns signed byte displacement from the current representation
-        /// to `origin`.
+        /// to const pointer `origin`.
+        ///
+        /// This is a convenience wrapper over `byte_offset_from(uptr)`. The
+        /// result is computed as `origin - current`, expressed in bytes.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// const i64 values[4]{};
+        ///
+        /// uptr current = uptr::from_const_ptr(&values[2]);
+        /// isize disp = current.byte_offset_from_const_ptr(&values[0]);
+        /// ```
         template <typename T>
         [[nodiscard]]
         constexpr isize byte_offset_from_const_ptr(T const *origin) const noexcept {
@@ -430,14 +479,34 @@ namespace ffc::core::ptr {
         /// `origin` expressed in units of `sizeof(T)`.
         ///
         /// This is equivalent to `byte_offset_from(origin) / sizeof(T)`.
-        template<typename T>
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// i64 values[4]{};
+        ///
+        /// uptr current = uptr::from_ptr(&values[3]);
+        /// isize disp = current.offset_from<i64>(uptr::from_ptr(&values[0]));
+        /// ```
+        template <typename T>
         [[nodiscard]]
         constexpr isize offset_from(uptr origin) const noexcept {
             return byte_offset_from(origin) / sizeof(T);
         }
 
         /// Returns signed displacement from the current representation to
-        /// `origin` expressed in units of `sizeof(T)`.
+        /// pointer `origin` expressed in units of `sizeof(T)`.
+        ///
+        /// This is a convenience wrapper over `offset_from<T>(uptr)`.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// i64 values[4]{};
+        ///
+        /// uptr current = uptr::from_ptr(&values[3]);
+        /// isize disp = current.offset_from_ptr<i64>(&values[0]);
+        /// ```
         template <typename T>
         [[nodiscard]]
         constexpr isize offset_from_ptr(T *origin) const noexcept {
@@ -445,7 +514,18 @@ namespace ffc::core::ptr {
         }
 
         /// Returns signed displacement from the current representation to
-        /// `origin` expressed in units of `sizeof(T)`.
+        /// const pointer `origin` expressed in units of `sizeof(T)`.
+        ///
+        /// This is a convenience wrapper over `offset_from<T>(uptr)`.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// const i64 values[4]{};
+        ///
+        /// uptr current = uptr::from_const_ptr(&values[3]);
+        /// isize disp = current.offset_from_const_ptr<i64>(&values[0]);
+        /// ```
         template <typename T>
         [[nodiscard]]
         constexpr isize offset_from_const_ptr(T const *origin) const noexcept {
