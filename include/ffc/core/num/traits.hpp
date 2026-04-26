@@ -32,6 +32,7 @@ namespace ffc::core::num {
     /// auto max8i = num::IntTraits<i8>::MAX;
     /// // fails.
     /// auto max32f = num::IntTraits<f32>::MAX;
+    /// //   ^~~~~~   ~~~~~~~~~~~~~~~~~~~~~~~~ illegal type error! 
     /// ```
     template <typename T>
         requires
