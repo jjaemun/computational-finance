@@ -24,7 +24,7 @@ namespace ffc::core::ptr {
     /// #include <cassert>
     /// using namespace ffc::core::ptr;
     ///     
-    /// constexpr isize OFFSET{32};
+    /// constexpr isize OFFSET{8};
     ///
     /// struct Foo {
     ///     i32 bar;
@@ -278,7 +278,7 @@ namespace ffc::core::ptr {
         /// ```c++
         /// using namespace ffc::core::ptr;
         ///
-        /// const usize count = (2uz << 59uz) + 1uz;
+        /// const usize count = (2uz << 64uz) - 1uz;
         ///
         /// i64 foo{};
         /// uptr addr = uptr::from_ptr(&foo);
@@ -288,8 +288,8 @@ namespace ffc::core::ptr {
         /// //   Equivalently (e.g., in an LP-64 system):
         /// //   
         /// //   /    usize bytes = count * sizeof(T);
-        /// //   |                  ----------------- ((2^64) + 1) overflows 64 bits and \
-        /// //   |                                    wraps to min value.
+        /// //   |                  ----------------- overflows 64 bits and wraps to min \
+        /// //   |                                    min value.
         /// //   | 
         /// //   |    uptr RET = addr.byte_add(bytes);
         /// //   |         ^~~   ~~~~~~~~~~~~~~~~~~~~ now binds the wrapped byte offset  \
@@ -343,7 +343,7 @@ namespace ffc::core::ptr {
         /// ```c++
         /// using namespace ffc::core::ptr;
         ///
-        /// const usize count = (2uz << 59uz) + 1uz;
+        /// const usize count = (2uz << 64uz) - 1uz;
         ///
         /// i64 foo{};
         /// uptr addr = uptr::from_ptr(&foo);
@@ -353,8 +353,8 @@ namespace ffc::core::ptr {
         /// //   Equivalently (e.g., in an LP-64 system):
         /// //
         /// //   /    usize bytes = count * sizeof(T);
-        /// //   |                  ----------------- ((2^64) + 1) overflows 64 bits and \
-        /// //   |                                    wraps to min value.
+        /// //   |                  ----------------- overflows 64 bits and wraps to min \
+        /// //   |                                    value.
         /// //   |
         /// //   |    uptr RET = addr.byte_sub(bytes);
         /// //   |         ^~~   ~~~~~~~~~~~~~~~~~~~~ now binds the wrapped byte offset  \
@@ -370,25 +370,27 @@ namespace ffc::core::ptr {
         
         /// Returns a new `uptr` displaced by signed byte offset.
         ///
-        /// Positive values advance the representation, while negative values regress it.
+        /// Delegates to `byte_add()` and `byte_sub` for advancing and regressing representations.
         ///
         /// ```c++
         /// #include <cassert>
         /// using namespace ffc::core::ptr;
         /// 
-        /// constexpr isize BIT32STRIDE{32};
-        ///
         /// uptr nullish = uptr::zero();
-        /// uptr advanced = addr.offset_bytes(BIT32STRIDE);
-        /// // do something (...) and regress it.
-        /// uptr regressed = fore.offset_bytes(-BIT32STRIDE);
-        /// 
-        /// assert(nullish.to_unsigned() == back.to_unsigned());
+        /// uptr advance = nullish.offset_bytes(64);
+        /// uptr regress = advance.offset_bytes(-8);
         /// ```
         ///
-        /// This operation has conditional branching and delegates to `byte_add()` and
-        /// `byte_sub()`. Negative signed offsets are therefore not converted into unsigned
-        /// unsigned representations before the displacement is applied.
+        /// This operation is branched to prevent negative offsets being directly cast as 
+        /// unsigned representations. In the negative case, the pattern 
+        ///
+        /// ```c++
+        /// 
+        /// auto _ = static_cast<usize>(-(neg + 1u)) + 1u);
+        /// ```
+        ///
+        /// follows from the fact that negating the most negative signed value directly in
+        /// a same-width signed integer is UB.
         [[nodiscard]]
         constexpr uptr offset_bytes(isize bytes) const noexcept {
             if (bytes >= 0)
@@ -397,8 +399,8 @@ namespace ffc::core::ptr {
             return byte_sub(static_cast<usize>(-(bytes + 1u)) + 1u);
         }
 
-        /// Returns a new `uptr` displaced by signed offset expressed in
-        /// units of `sizeof(T)`.
+        /// Returns a new `uptr` displaced by signed offset expressed, given by
+        /// `count` units of `T`.
         ///
         /// Positive values advance the representation by `count * sizeof(T)`
         /// bytes, while negative values move it backward by the same rule.
@@ -411,21 +413,19 @@ namespace ffc::core::ptr {
         /// Returns signed byte displacement from the current representation
         /// to `origin`.
         ///
-        /// The result is computed as `origin - current`, expressed in bytes.
-        /// The operation is branched explicitly because subtraction occurs on
-        /// the unsigned representation layer, while the result is a signed
-        /// displacement.
+        /// The operation is branched explicitly because subtraction occurs in unsigned 
+        /// the unsigned representation space, while the result is a signed displacement.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
         ///
-        /// i64 lhs{};
-        /// i64 rhs{};
+        /// u8 foo{};
+        /// u8 bar{};
         ///
-        /// uptr a = uptr::from_ptr(&lhs);
-        /// uptr b = uptr::from_ptr(&rhs);
+        /// uptr fptr = uptr::from_ptr(&foo);
+        /// uptr bptr = uptr::from_ptr(&bar);
         ///
-        /// isize disp = a.byte_offset_from(b);
+        /// isize displacement = fptr.byte_offset_from(bptr);
         /// ```
         [[nodiscard]]
         constexpr isize byte_offset_from(uptr origin) const noexcept {
@@ -438,16 +438,15 @@ namespace ffc::core::ptr {
         /// Returns signed byte displacement from the current representation
         /// to pointer `origin`.
         ///
-        /// This is a convenience wrapper over `byte_offset_from(uptr)`. The
-        /// result is computed as `origin - current`, expressed in bytes.
+        /// It is a convenience wrapper that delegates to `byte_offset_from()`.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
         ///
-        /// i64 values[4]{};
+        /// u8 buffer[0xff];
+        /// uptr addr = uptr::from_ptr(&buffer[0xf]);
         ///
-        /// uptr current = uptr::from_ptr(&values[2]);
-        /// isize disp = current.byte_offset_from_ptr(&values[0]);
+        /// isize displacement = addr.byte_offset_from_ptr(&buffer[0]);
         /// ```
         template <typename T>
         [[nodiscard]]
@@ -458,16 +457,15 @@ namespace ffc::core::ptr {
         /// Returns signed byte displacement from the current representation
         /// to const pointer `origin`.
         ///
-        /// This is a convenience wrapper over `byte_offset_from(uptr)`. The
-        /// result is computed as `origin - current`, expressed in bytes.
+        /// It is a convenience wrapper that delegates to `byte_offset_from()`.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
         ///
-        /// const i64 values[4]{};
+        /// const u64 buffer[0xff];
+        /// uptr addr = uptr::from_const_ptr(&buffer[0xf]);
         ///
-        /// uptr current = uptr::from_const_ptr(&values[2]);
-        /// isize disp = current.byte_offset_from_const_ptr(&values[0]);
+        /// isize displacement = addr.byte_offset_from_const_ptr(&buffer[0]);
         /// ```
         template <typename T>
         [[nodiscard]]
@@ -478,15 +476,16 @@ namespace ffc::core::ptr {
         /// Returns signed displacement from the current representation to
         /// `origin` expressed in units of `sizeof(T)`.
         ///
-        /// This is equivalent to `byte_offset_from(origin) / sizeof(T)`.
+        /// It is equivalent to `byte_offset_from(origin) / sizeof(T)`.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
         ///
-        /// i64 values[4]{};
+        /// const u8 buffer[0xff];
+        /// uptr origin = uptr::from_ptr(&buffer[0]);
+        /// uptr addr = uptr::from_ptr(&buffer[0xf]);
         ///
-        /// uptr current = uptr::from_ptr(&values[3]);
-        /// isize disp = current.offset_from<i64>(uptr::from_ptr(&values[0]));
+        /// isize displacement = addr.offset_from<u8>(origin);
         /// ```
         template <typename T>
         [[nodiscard]]
@@ -502,10 +501,10 @@ namespace ffc::core::ptr {
         /// ```c++
         /// using namespace ffc::core::ptr;
         ///
-        /// i64 values[4]{};
+        /// u8 buffer[0xff];
+        /// uptr addr = uptr::from_ptr(&buffer[0xf]);
         ///
-        /// uptr current = uptr::from_ptr(&values[3]);
-        /// isize disp = current.offset_from_ptr<i64>(&values[0]);
+        /// isize displacement = addr.offset_from_ptr(&buffer[0]);
         /// ```
         template <typename T>
         [[nodiscard]]
@@ -521,10 +520,10 @@ namespace ffc::core::ptr {
         /// ```c++
         /// using namespace ffc::core::ptr;
         ///
-        /// const i64 values[4]{};
+        /// const u8 buffer[0xff];
+        /// uptr addr = uptr::from_const_ptr(&buffer[0xf]);
         ///
-        /// uptr current = uptr::from_const_ptr(&values[3]);
-        /// isize disp = current.offset_from_const_ptr<i64>(&values[0]);
+        /// isize displacement = addr.offset_from_const_ptr(&buffer[0]);
         /// ```
         template <typename T>
         [[nodiscard]]
