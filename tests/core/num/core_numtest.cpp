@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "ffc/num/types.hpp"
+#include "ffc/types.hpp"
 #include "ffc/core/num/num.hpp"
 
 
