@@ -39,16 +39,7 @@ namespace ffc::core::approx {
             : coeffs{ std::forward<Coeffs>(coeffs_)... } {}
 
         [[nodiscard]]
-             
-            // If available, forcing inline improves performance, but is
-            // generally superfluous.
-        #if defined(_MSC_VER)
-
-            // msvc.
-        [[msvc::forceinline]]
         #if defined(__GNUC__) || defined(__clang__)
-
-            // gcc / clang.
         __attribute__((always_inline))
         #elif defined(_MSC_VER)
         [[msvc::forceinline]]
