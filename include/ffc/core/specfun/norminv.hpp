@@ -4,6 +4,7 @@
 
 #include "ffc/core/types.hpp"
 #include "ffc/core/approx/horner.hpp"
+#include "ffc/core/num/traits.hpp"
 
 
 namespace ffc::core::specfun {

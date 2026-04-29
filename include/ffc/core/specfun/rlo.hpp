@@ -2,8 +2,10 @@
 
 #include <cmath>
 
+
 #include "ffc/core/types.hpp"
 #include "ffc/core/approx/horner.hpp"
+#include "ffc/core/num/traits.hpp"
 
 
 namespace ffc::core::specfun {
@@ -44,7 +46,7 @@ namespace ffc::core::specfun {
     );
 
     if (u <= (f64)-1.0)
-        return NAN;
+        return num::FpTraits<f64>::QUIET_NAN;
 
     // direct evaluation. 
     if (u < leftbound || rightbound < u)
