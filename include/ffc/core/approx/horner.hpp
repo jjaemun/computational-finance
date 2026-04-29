@@ -25,11 +25,8 @@ namespace ffc::core::approx {
         [[nodiscard]] 
         #elif defined(_MSC_VER)
 
-
-            /**
-             * If available, forcing inline improves performance, but is
-             * generally superfluous.
-             */
+             // If available, forcing inline improves performance, but
+             // is generally superfluous.
 
         __forceinline
         #if defined(__GNUC__) || defined(__clang__)
@@ -37,9 +34,7 @@ namespace ffc::core::approx {
         #endif
         constexpr type<Coeffs...> operator()(const type<Coeffs...> u) const noexcept {
    
-            /**
-             * `std::fma` is chosen to reduce rounding errors.
-             */
+             // std::fma is chosen to reduce rounding errors.
 
             auto ret = (type<Coeffs...>)0.0;
             for (auto it = coeffs.rbegin(); it != coeffs.rend(); ++it)
