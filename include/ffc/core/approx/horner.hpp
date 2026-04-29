@@ -45,6 +45,7 @@ namespace ffc::core::approx {
              * If available, forcing inline improves performance, but is
              * generally superfluous.
              */
+
         __attribute__((always_inline))
         #elif defined(_MSC_VER)
         [[msvc::forceinline]]
