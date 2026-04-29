@@ -39,16 +39,17 @@ namespace ffc::core::approx {
             : coeffs{ std::forward<Coeffs>(coeffs_)... } {}
 
         [[nodiscard]] 
-        #if defined(__GNUC__) || defined(__clang__)
+        #elif defined(_MSC_VER)
+
 
             /**
              * If available, forcing inline improves performance, but is
              * generally superfluous.
              */
 
+        __forceinline
+        #if defined(__GNUC__) || defined(__clang__)
         __attribute__((always_inline))
-        #elif defined(_MSC_VER)
-        [[msvc::forceinline]]
         #endif
         constexpr type<Coeffs...> operator()(const type<Coeffs...> u) const noexcept {
    
