@@ -38,13 +38,23 @@ namespace ffc::core::approx {
         constexpr Horner(Coeffs&&... coeffs_) noexcept
             : coeffs{ std::forward<Coeffs>(coeffs_)... } {}
 
-        [[nodiscard]]
+        [[nodiscard]] 
         #if defined(__GNUC__) || defined(__clang__)
+
+            /**
+             * If available, forcing inline improves performance, but is
+             * generally superfluous.
+             */
         __attribute__((always_inline))
         #elif defined(_MSC_VER)
         [[msvc::forceinline]]
         #endif
         constexpr type<Coeffs...> operator()(const type<Coeffs...> u) const noexcept {
+   
+            /**
+             * `std::fma` is chosen to reduce rounding errors.
+             */
+
             auto ret = (type<Coeffs...>)0.0;
             for (auto it = coeffs.rbegin(); it != coeffs.rend(); ++it)
                 ret = std::fma(ret, u, *it);
@@ -55,4 +65,7 @@ namespace ffc::core::approx {
     private:
         std::array<type<Coeffs...>, sizeof...(Coeffs)> coeffs;
     };
+
+    template <typename... Coeffs>
+    Horner(Coeffs...) -> Horner<Coeffs...>;
 } // namespace ffc::core::approx
