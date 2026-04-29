@@ -10,22 +10,6 @@
 
 
 namespace ffc::core::approx {
-    /// Compile-time Horner polynomial evaluation object for 
-    /// floating point coefficients.
-    ///
-    /// `Horner` is a zero cost abstraction enabling possibly compile-time
-    /// polynomial evaluations. It is a building block for numerical kernels.
-    ///
-    /// ```c++
-    /// using namespace ffc::core::approx;
-    ///
-    /// static constexpr Horner polynomial{
-    ///     1.0, 2.0, 
-    ///     3.0, 4.0,
-    /// };
-    ///
-    /// auto eval = polynomial(0.5);
-    ///```
     template <typename... Coeffs>
         requires
             ((core::num::FpType<Coeffs>) && ...)
