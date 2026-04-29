@@ -6,12 +6,26 @@
 #include <utility>
 #include <type_traits>
 
-#include "ffc/core/utils.hpp"
 #include "ffc/core/num/num.hpp"
 
 
 namespace ffc::core::approx {
-
+    /// Compile-time Horner polynomial evaluation object for 
+    /// floating point coefficients.
+    ///
+    /// `Horner` is a zero cost abstraction enabling possibly compile-time
+    /// polynomial evaluations. It is a building block for numerical kernels.
+    ///
+    /// ```c++
+    /// using namespace ffc::core::approx;
+    ///
+    /// static constexpr Horner polynomial{
+    ///     1.0, 2.0, 
+    ///     3.0, 4.0,
+    /// };
+    ///
+    /// auto eval = polynomial(0.5);
+    ///```
     template <typename... Coeffs>
         requires
             ((core::num::FpType<Coeffs>) && ...)
@@ -24,21 +38,22 @@ namespace ffc::core::approx {
         constexpr Horner(Coeffs&&... coeffs_) noexcept
             : coeffs{ std::forward<Coeffs>(coeffs_)... } {}
 
-
         [[nodiscard]]
-        #if defined(__GNUC__) || defined(__clang__)
-            
+             
             // If available, forcing inline improves performance, but is
             // generally superfluous.
-        
+        #if defined(_MSC_VER)
+
+            // msvc.
+        [[msvc::forceinline]]
+        #if defined(__GNUC__) || defined(__clang__)
+
+            // gcc / clang.
         __attribute__((always_inline))
+        #elif defined(_MSC_VER)
+        [[msvc::forceinline]]
         #endif
         constexpr type<Coeffs...> operator()(const type<Coeffs...> u) const noexcept {
-            
-            // std::fma is chosen to reduce rounding errors. The performance hit 
-            // of using stl machinery, e.g., std::views::reverse, is considerable 
-            // since it prevents aggresive unrolling, therefore it is avoided.
-            
             auto ret = (type<Coeffs...>)0.0;
             for (auto it = coeffs.rbegin(); it != coeffs.rend(); ++it)
                 ret = std::fma(ret, u, *it);
