@@ -13,7 +13,6 @@
 namespace {
     namespace core = ffc::core::approx;
 
-
     template <typename T, const ffc::usize N>
     inline T expected(const std::array<T, N> &coeffs, T arg) noexcept {
         
@@ -21,15 +20,12 @@ namespace {
         
         auto RET = (T)0.0;
         for (const auto &coeff : coeffs | std::views::reverse)
-    //                                    ^~~~~~~~~~~~~~~~~~~ notice that Horner requires that
-    //                                                        that the coefficients be traversed in reverse.
+    //                                    ^~~~~~~~~~~~~~~~~~~ Horner requires that coefficients
+    //                                                        be traversed in reverse.
             RET = std::fma(RET, arg, coeff);
-    //      ^~~   ~~~~~~~~~~~~~~~~~~~~~~~~~ similarly, std::fma is used to check that we 
-    //                                      achieve the same results.
+    //            ^~~~~~~~ std::fma is used for 'apples-to-apples' comparisons.
         return RET;
     }
-
-
 
     TEST(horner_approxtest, TrivialExecTest) {
         std::array<ffc::f64, 8uz> coeffs{
