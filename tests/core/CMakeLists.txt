@@ -1,7 +1,9 @@
 # --testing.
 set(
     directories
+    approx
     num 
+    #ptr
 )
 
 foreach(directory ${directories})
