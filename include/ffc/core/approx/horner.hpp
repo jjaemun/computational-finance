@@ -19,7 +19,7 @@ namespace ffc::core::approx {
         using type = std::common_type_t<Types...>;
 
     public:
-        constexpr Horner(Coeffs&&... coeffs_) noexcept
+        constexpr Horner(Coeffs... coeffs_) noexcept
             : coeffs{ std::forward<Coeffs>(coeffs_)... } {}
 
         [[nodiscard]] 
