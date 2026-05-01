@@ -20,10 +20,9 @@ namespace {
         
         auto RET = (T)0.0;
         for (const auto &coeff : coeffs | std::views::reverse)
-    //                                    ^~~~~~~~~~~~~~~~~~~ Horner requires that coefficients
-    //                                                        be traversed in reverse.
             RET = std::fma(RET, arg, coeff);
     //            ^~~~~~~~ std::fma is used for 'apples-to-apples' comparisons.
+    
         return RET;
     }
 
