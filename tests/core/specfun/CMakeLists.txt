@@ -11,7 +11,7 @@ target_link_libraries(
 )
 
 gtest_discover_tests(
-    core_norminv_specfun TESTLIST 
+    core_norminv_specfuntest TESTLIST 
     tests
 )
 
