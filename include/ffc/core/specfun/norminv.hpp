@@ -19,6 +19,9 @@ namespace ffc::core::specfun {
     __attribute__((always_inline))
     #endif    
     inline f64 norminv(const f64 u) noexcept {
+        
+        // ALGO AS241 APPL. STATIST. (Wichura, 1988) VOL. 37, NO 3.
+
         // deviation boundaries. 
         static constexpr auto centrbound = (f64)0.425e0;
         static constexpr auto tailbound = (f64)5.0e0;
