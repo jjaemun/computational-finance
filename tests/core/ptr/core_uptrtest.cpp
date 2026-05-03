@@ -77,11 +77,11 @@ namespace {
         
         // signed typed.
         constexpr ffc::isize soffset{1};
-        constexpr auto posbytes = addr.offset<ffc::i64>(soffset);
-        constexpr auto negbytes = addr.offset<ffc::i64>(-soffset);
+        constexpr auto postyped = addr.offset<ffc::i64>(soffset);
+        constexpr auto negtyped = addr.offset<ffc::i64>(-soffset);
 
-        static_assert(posbytes.to_usize() == 16uz);
-        static_assert(negbytes.to_usize() == 0uz);
+        static_assert(postyped.to_usize() == 16uz);
+        static_assert(negtyped.to_usize() == 0uz);
 
         EXPECT_TRUE(true);
     }
