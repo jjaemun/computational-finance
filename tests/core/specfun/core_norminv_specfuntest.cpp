@@ -8,7 +8,7 @@
 
 
 #include "ffc/types.hpp"
-#include "ffc/core/num/traits.hpp"
+#include "ffc/core/num/num.hpp"
 #include "ffc/core/specfun/norminv.hpp"
 
 
@@ -20,10 +20,10 @@ namespace {
     namespace core = ffc::core;
    
     constexpr std::array<ffc::f64, 34> probabilities{
-        0.0, 
-     // ^~~ lower limit value.
+        0.0,
+     // ----+ lower limit value.
     
-        1e-12, 
+        1e-12,
         1e-11,
         1e-10,
         1e-9,
@@ -35,18 +35,18 @@ namespace {
         1e-3,
         1e-2,
         1e-1,
-     // ^~~~ extreme left tail region.
-    
-        2e-1, 
-        3e-1, 
-        4e-1, 
-        5e-1, 
-        6e-1, 
-        7e-1, 
-        8e-1, 
-        9e-1, 
-     // ^~~~ central region.
-    
+     // ----+ extreme left tail.
+
+        2e-1,
+        3e-1,
+        4e-1,
+        5e-1,
+        6e-1,
+        7e-1,
+        8e-1,
+        9e-1,
+     // ----+ central region.
+
         1.0 - 1e-1,
         1.0 - 1e-2,
         1.0 - 1e-3,
@@ -59,10 +59,10 @@ namespace {
         1.0 - 1e-10,
         1.0 - 1e-11,
         1.0 - 1e-12,
-     // ^~~~~~~~~~~ extreme right tail region.
-   
+     // -----------+ extreme right tail.
+
         1.0
-     // ^~~ upper limit value.
+     // ----+ upper limit value.
     };
 
     TEST(norminv_specfuntest, BoundaryBehaviour) {
@@ -92,7 +92,7 @@ namespace {
         }
     }
 
-    TEST(norminv_specfuntest, CriticalProbabilities) {
+   TEST(norminv_specfuntest, CriticalProbabilities) {
         using ffc::core::specfun::norminv;
         
         EXPECT_NEAR(norminv(0.8413447460685429), 1.0, 1e-12);
