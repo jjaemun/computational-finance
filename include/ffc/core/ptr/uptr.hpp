@@ -271,9 +271,8 @@ namespace ffc::core::ptr {
         /// uptr advanced = addr.add<i64>(2uz);
         /// ```
         ///
-        /// This operation is unchecked. If the offset, when computed in bytes,
-        /// overflows `usize`, the value wraps, invoking specified but undesired
-        /// behaviour.
+        /// This operation is unchecked. If the offset, when computed in bytes, overflows
+        /// `usize`, the value wraps, invoking specified but undesired behaviour.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
@@ -488,7 +487,7 @@ namespace ffc::core::ptr {
         template <typename T>
         [[nodiscard]]
         constexpr isize offset_from(uptr origin) const noexcept {
-            return byte_offset_from(origin) / sizeof(T);
+            return byte_offset_from(origin) / static_cast<isize>(sizeof(T));
         }
 
         /// Returns signed displacement from the current representation to
