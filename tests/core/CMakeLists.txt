@@ -3,7 +3,8 @@ set(
     directories
     approx
     num 
-    #ptr
+    ptr
+    specfun
 )
 
 foreach(directory ${directories})
