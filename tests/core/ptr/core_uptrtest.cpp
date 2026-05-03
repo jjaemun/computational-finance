@@ -54,11 +54,11 @@ namespace {
 
         // signed bytes.
         constexpr ffc::isize soffset{8};
-        constexpr auto positive = addr.offset_bytes(soffset);
-        constexpr auto negative = addr.offset_bytes(-soffset);
+        constexpr auto posbytes = addr.offset_bytes(soffset);
+        constexpr auto negbytes = addr.offset_bytes(-soffset);
 
-        static_assert(positive.to_usize() == 16uz);
-        static_assert(negative.to_usize() == 0uz);
+        static_assert(posbytes.to_usize() == 16uz);
+        static_assert(negbytes.to_usize() == 0uz);
 
         EXPECT_TRUE(true);
     }
@@ -77,11 +77,11 @@ namespace {
         
         // signed typed.
         constexpr ffc::isize soffset{1};
-        constexpr auto positive = addr.offset<ffc::i64>(soffset);
-        constexpr auto negative = addr.offset<ffc::i64>(-soffset);
+        constexpr auto posbytes = addr.offset<ffc::i64>(soffset);
+        constexpr auto negbytes = addr.offset<ffc::i64>(-soffset);
 
-        static_assert(positive.to_usize() == 16uz);
-        static_assert(negative.to_usize() == 0uz);
+        static_assert(posbytes.to_usize() == 16uz);
+        static_assert(negbytes.to_usize() == 0uz);
 
         EXPECT_TRUE(true);
     }
@@ -121,13 +121,13 @@ namespace {
         constexpr auto not_ = lhs.bit_not();
         constexpr auto or_ = lhs.bit_or(rhs);
         constexpr auto xor_ = lhs.bit_xor(rhs);
-        constexpr auto masking = lhs.mask(rhs);
+        constexpr auto mask_ = lhs.mask(rhs);
 
         static_assert(and_.to_usize() == 0x00uz);
         static_assert(not_.to_unsigned() == ~lhs.to_unsigned());
         static_assert(or_.to_usize() == 0xffuz);
         static_assert(xor_.to_usize() == 0xffuz);
-        static_assert(masking.to_usize() == 0x00uz);
+        static_assert(mask_.to_usize() == 0x00uz);
 
         EXPECT_TRUE(true);
     }
