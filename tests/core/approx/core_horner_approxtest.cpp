@@ -28,17 +28,25 @@ namespace {
 
     TEST(horner_approxtest, TrivialExecTest) {
         std::array<ffc::f64, 8uz> coeffs{
-            1.0, 2.0,
-            3.0, 4.0,
-            5.0, 6.0,
-            7.0, 8.0
+            1.0, 
+            2.0,
+            3.0, 
+            4.0,
+            5.0, 
+            6.0,
+            7.0, 
+            8.0
         };
 
         core::Horner horner{
-            coeffs[0], coeffs[1],
-            coeffs[2], coeffs[3],
-            coeffs[4], coeffs[5],
-            coeffs[6], coeffs[7]
+            coeffs[0], 
+            coeffs[1],
+            coeffs[2], 
+            coeffs[3],
+            coeffs[4], 
+            coeffs[5],
+            coeffs[6], 
+            coeffs[7]
         };
 
         ffc::f64 arg{1.0};
