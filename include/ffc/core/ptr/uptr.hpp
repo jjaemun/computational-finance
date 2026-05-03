@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "ffc/core/num/num.hpp"
+#include "ffc/core/types.hpp"
 #include "ffc/core/ptr/repr.hpp"
 
 
@@ -61,7 +61,7 @@ namespace ffc::core::ptr {
         /// uptr{};
         ///```
         ///
-        /// `uptr` is therefore both `default` and `nothrow` default-constructible.
+        /// `uptr` is both `default` and `nothrow` default-constructible.
         constexpr uptr() noexcept = default;
        
         /// Constructs `uptr` from raw `repr::uptr` unsigned pointer representation.
@@ -194,7 +194,7 @@ namespace ffc::core::ptr {
         template <typename T>
         [[nodiscard]]
         const T *as_const_ptr() const noexcept {
-            return reinterpret_cast<T const*>(value);
+            return reinterpret_cast<const T*>(value);
         }
         
         /// Returns the underlying raw `repr::uptr`.
@@ -324,9 +324,8 @@ namespace ffc::core::ptr {
 
         /// Returns a new `uptr` moved backward by `count` elements of `T`.
         ///
-        /// Subtracts an unsigned typed offset from a pointer representation. It is
-        /// equivalent to regressing the underlying representation by
-        /// `count * sizeof(T)` bytes.
+        /// Subtracts an unsigned typed offset from a pointer representation. It is equivalent
+        /// to regressing the underlying representation by `count * sizeof(T)` bytes.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
@@ -336,9 +335,8 @@ namespace ffc::core::ptr {
         /// uptr regressed = addr.sub<i64>(2uz);
         /// ```
         ///
-        /// This operation is unchecked. If the offset, when computed in bytes,
-        /// overflows `usize`, the value wraps, invoking specified but undesired
-        /// behaviour.
+        /// This operation is unchecked. If the offset, when computed in bytes, overflows
+        /// `usize`, the value wraps, invoking specified but undesired behaviour.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
@@ -370,7 +368,7 @@ namespace ffc::core::ptr {
         
         /// Returns a new `uptr` displaced by signed byte offset.
         ///
-        /// Delegates to `byte_add()` and `byte_sub` for advancing and regressing representations.
+        /// Delegates to `byte_add()` and `byte_sub()` for advancing and regressing representations.
         ///
         /// ```c++
         /// #include <cassert>
@@ -414,7 +412,7 @@ namespace ffc::core::ptr {
         /// to `origin`.
         ///
         /// The operation is branched explicitly because subtraction occurs in unsigned 
-        /// the unsigned representation space, while the result is a signed displacement.
+        /// representation space, while the result is a signed displacement.
         ///
         /// ```c++
         /// using namespace ffc::core::ptr;
@@ -529,6 +527,97 @@ namespace ffc::core::ptr {
         [[nodiscard]]
         constexpr isize offset_from_const_ptr(T const *origin) const noexcept {
             return offset_from<T>(uptr::from_const_ptr(origin));
+        }
+
+        /// Returns a new `uptr` produced by bitwise-AND with `other`.
+        ///
+        /// `bit_and()` is useful for explicit masking and alignment-style
+        /// address-representation manipulation.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// uptr addr = uptr::from_usize(0xffuz);
+        /// uptr mask = uptr::from_usize(0x0fuz);
+        ///
+        /// uptr masked = addr.bit_and(mask);
+        /// ```
+        [[nodiscard]]
+        constexpr uptr bit_and(uptr other) const noexcept {
+            return uptr{ value & other.value };
+        }
+
+        /// Returns a new `uptr` produced by bitwise-OR with `other`.
+        ///
+        /// `bit_or()` is useful whenever address representations carry
+        /// flag bits or are intentionally combined at the bit level.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// uptr lhs = uptr::from_usize(0xf0uz);
+        /// uptr rhs = uptr::from_usize(0x0fuz);
+        ///
+        /// uptr combined = lhs.bit_or(rhs);
+        /// ```
+        [[nodiscard]]
+        constexpr uptr bit_or(uptr other) const noexcept {
+            return uptr{ value | other.value };
+        }
+
+        /// Returns a new `uptr` produced by bitwise-XOR with `other`.
+        ///
+        /// `bit_xor()` is useful when explicitly toggling or comparing
+        /// differing bit regions of address representations.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// uptr lhs = uptr::from_usize(0xf0uz);
+        /// uptr rhs = uptr::from_usize(0x0fuz);
+        ///
+        /// uptr toggled = lhs.bit_xor(rhs);
+        /// ```
+        [[nodiscard]]
+        constexpr uptr bit_xor(uptr other) const noexcept {
+            return uptr{ value ^ other.value };
+        }
+
+        /// Returns a new `uptr` produced by bitwise-NOT.
+        ///
+        /// `bit_not()` complements the full stored unsigned pointer
+        /// representation bit pattern.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// uptr addr = uptr::from_usize(0x0fuz);
+        /// auto compl = addr.bit_not();
+        /// ```
+        [[nodiscard]]
+        constexpr uptr bit_not() const noexcept {
+            return uptr{ ~value };
+        }
+
+        /// Returns a new `uptr` masked by `bitmask`.
+        ///
+        /// Applies a bitwise-AND between the current pointer representation and the
+        /// representation stored in `bitmask`.
+        ///
+        /// ```c++
+        /// using namespace ffc::core::ptr;
+        ///
+        /// uptr addr = uptr::from_usize(0xff);
+        /// uptr mask = uptr::from_usize(0x0f);
+        ///
+        /// uptr masked = addr.mask(mask);
+        /// ```
+        ///
+        /// This is a pure representation-space operation. It does not imply
+        /// that the resulting representation corresponds to a valid pointer.
+        [[nodiscard]]
+        constexpr uptr mask(uptr bitmask) const noexcept {
+            return bit_and(bitmask);
         }
    };
 } // namespace ffc::core::ptr
